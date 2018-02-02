@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html ng-app="clientBizApp">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Node/Angular Client Billing App</title>
+  <link rel="stylesheet" href="styles.css">
+
+  <!-- SPELLS -->
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script><!-- load jquery -->
+  <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.0.8/angular.min.js"></script><!-- load angular -->
+  <script src="core.js"></script>
+</head>
+<body ng-controller="clientListController">
+
+  <table>
+    <tr>
+      <td>
+        <div>
+          <table>
+            <tr ng-repeat="customer in clients">
+              <td><a href ng-click="selectClient(customer.clientId)">{{ customer.firstname }}</a></td>
+            </tr>
+          </table>
+        </div>
+      </td>
+      <td style="vertical-align:top;">
+        <div id="clientDetail">
+            <table valign="top">
+              <tr>
+                <td style="align=right;">Client ID:</td>
+                <td style="align:left;">{{ client.clientId }}</td>
+              </tr>
+              <tr>
+                <td style="align=right;">First name:</td>
+                <td style="align:left;">{{ client.firstname }}</td>
+              </tr>
+              <tr>
+                <td style="align=right;">Last name:</td>
+                <td style="align:left;">{{ client.lastname }}</td>
+              </tr>
+              <tr>
+                <td style="align=right;">Contact name:</td>
+                <td style="align:left;">{{ client.contactname }}</td>
+              </tr>
+              <tr>
+                <td style="align=right;">City:</td>
+                <td style="align:left;">{{ client.city }}</td>
+              </tr>
+              <tr>
+                <td style="align=right;">State:</td>
+                <td style="align:left;">{{ client.state }}</td>
+              </tr>
+              <tr>
+                <td style="align=right;">Timezone:</td>
+                <td style="align:left;">{{ client.timezone }}</td>
+              </tr>
+              <tr>
+                <td style="align=right;">First contacted:</td>
+                <td style="align:left;">{{ client.firstcontact }}</td>
+              </tr>
+              <tr>
+                <td style="align=right;">First responded:</td>
+                <td style="align:left;">{{ client.firstresponse }}</td>
+              </tr>
+              <tr>
+                <td style="align=right;">Solicited:</td>
+                <td style="align:left;">{{ client.solicited }}</td>
+              </tr>
+            </table>
+        </div>
+      </td>
+    </tr>
+  </table>
+
+</body>
+</html>
