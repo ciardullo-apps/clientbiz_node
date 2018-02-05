@@ -29,6 +29,13 @@ function clientListController($scope, $http) {
       .error(function(data) {
       });
 
+      $http.get('/appointments/' + clientId)
+        .success(function(data) {
+          $scope.appointments = data.appointments;
+        })
+        .error(function(data) {
+        });
+
   }
 
   $http.get('/client')

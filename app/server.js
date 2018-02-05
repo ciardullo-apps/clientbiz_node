@@ -83,6 +83,45 @@ app.get('/client/:clientId', function(request, response) {
   connection.end();
 });
 
+app.get('/appointments/:clientId', function(request, response) {
+  let clientId = request.params['clientId'];
+  var connection = getConnection();
+  connection.connect();
+
+  var appointments = new Array();
+
+  var query = connection.query('SELECT id, client_id, topic_id, starttime, duration, rate, billingpct, paid FROM appointment WHERE client_id = ' + clientId);
+  query
+    .on('error', function(err) {
+      // Handle error, an 'end' event will be emitted after this as well
+      console.log(err);
+    })
+    .on('fields', function(fields) {
+      // the field packets for the rows to follow
+    })
+    .on('result', function(row) {
+      appointments.push ({
+        'appointmentId': row.id,
+        'clientId': row.client_id,
+        'topicId': row.topic_id,
+        'startTime': row.starttime,
+        'duration': row.duration,
+        'rate': row.rate,
+        'billingPct': row.billingpct,
+        'datePaid': row.paid
+      });
+    })
+    .on('end', function() {
+      // all rows have been received
+      var jsonMessage = {
+        'appointments': appointments
+      }
+      response.json(jsonMessage);
+    });
+
+  connection.end();
+});
+
 app.get('/', function(request, response) {
   // load the single view file (angular will handle the page changes on the front-end)
 

@@ -1,0 +1,24 @@
+<div id="appointmentDetail">
+    <table>
+      <thead>
+        <tr>
+          <th style="align=center;">Topic ID</td>
+          <th style="align=center;">Start time</td>
+          <th style="align=center;">Duration</td>
+          <th style="align=center;">Hourly Rate</td>
+          <th style="align=center;">Billing %</td>
+          <th style="align=center;">Date paid</td>
+        </tr>
+      </thead>
+      <tbody>
+        <tr ng-repeat="appointment in appointments">
+          <td style="align:left;">{{ appointment.topicId }}</td>
+          <td style="align:left;">{{ appointment.startTime }}</td>
+          <td style="align:left;">{{ appointment.duration }}</td>
+          <td style="align:left;">{{ appointment.rate }}</td>
+          <td style="align:left;">{{ appointment.billingPct }}</td>
+          <td style="align:left;">{{ appointment.datePaid }}</td>
+        </tr>
+      </tbody>
+    </table>
+</div>
