@@ -1,5 +1,5 @@
 <div id="appointmentDetail">
-    <table>
+    <table id="appointmentDetailTable">
       <thead>
         <tr>
           <th style="align=center;">Topic ID</td>
@@ -11,14 +11,29 @@
         </tr>
       </thead>
       <tbody>
+        <tr ng-form="appointmentDetail">
+          <input type="hidden" ng-model="formData.client_id" name="client_id" />
+          <td style="align:left;">
+            <select name="topic_id" ng-model="formData.topic_id" ng-options="topic.topicId as topic.topicName for topic in topics" >
+              <option value="{{ topic.topicId }}">{{ topic.topicName }}</option>
+            </select>
+          </td>
+          <td style="align:left;"><input type="datetime-local" name="starttime" ng-model="formData.starttime" /></td>
+          <td style="align:left;"><input type="number" name="duration" ng-model="formData.duration" min="10" max="600" size="5" /></td>
+          <td style="align:left;"><input type="number" name="rate" ng-model="formData.rate" min="10" max="600" size="5" /></td>
+          <td style="align:left;"><input type="number" name="billingpct"  ng-model="formData.billingpct" min="0.75" max="1.00" step="0.05" size="5" /></td>
+          <td style="align:left;"><input type="button" value="Save" ng-disabled="!formData.client_id"  ng-click="saveAppointment()" /></td>
+        </tr>
+
         <tr ng-repeat="appointment in appointments">
-          <td style="align:left;">{{ appointment.topicId }}</td>
-          <td style="align:left;">{{ appointment.startTime }}</td>
+          <td style="align:left;">{{ topics[appointment.topic_id - 1].topicName }}</td>
+          <td style="align:left;">{{ appointment.starttime }}</td>
           <td style="align:left;">{{ appointment.duration }}</td>
           <td style="align:left;">{{ appointment.rate }}</td>
-          <td style="align:left;">{{ appointment.billingPct }}</td>
-          <td style="align:left;">{{ appointment.datePaid }}</td>
+          <td style="align:left;">{{ appointment.billingpct }}</td>
+          <td style="align:left;">{{ appointment.paid }}</td>
         </tr>
       </tbody>
     </table>
+
 </div>
