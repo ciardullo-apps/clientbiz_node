@@ -3,6 +3,7 @@ var clientBizApp = angular.module('clientBizApp', []);
 
 function clientListController($scope, $http) {
   $scope.formData = {};
+  $scope.updateAppointmentData = {};
 
   $scope.selectClient = function(clientId) {
     if (!clientId) {
@@ -19,6 +20,7 @@ function clientListController($scope, $http) {
         var nextHour = new Date(date.getTime() - (date.getTimezoneOffset() * 60000));
         nextHour.setMinutes(0);
         nextHour.setHours(nextHour.getHours() + 1);
+        $('#datePicker').val(nextHour.toJSON().slice(0,10));
 
         $scope.formData = {
           'client_id': data.client.clientId,
@@ -67,6 +69,13 @@ function clientListController($scope, $http) {
     .error(function(data) {
     });
 
+  $http.get('/receivables')
+    .success(function(data) {
+      $scope.receivables = data.receivables;
+    })
+    .error(function(data) {
+    });
+
   $scope.saveAppointment = function() {
     $http({
         method: 'POST',
@@ -86,6 +95,29 @@ function clientListController($scope, $http) {
           });
       });
 
+  }
+
+  $scope.getPaid = function(appointmentId) {
+    $scope.updateAppointmentData["id"] = appointmentId;
+    $scope.updateAppointmentData["paid"] = $('#datePicker').val();
+
+    $http({
+        method: 'POST',
+        url: '/updateAppointment',
+        data: $.param($scope.updateAppointmentData),
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded'
+        }
+      })
+      .success(function(data) {
+        console.log(data);
+        $http.get('/appointments/' + $scope.formData['client_id'])
+          .success(function(data) {
+            $scope.appointments = data.appointments;
+          })
+          .error(function(data) {
+          });
+      });
   }
 
 }

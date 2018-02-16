@@ -162,6 +162,46 @@ app.get('/appointments/:clientId', function(request, response) {
   connection.end();
 });
 
+app.get('/receivables', function(request, response) {
+  let clientId = request.params['clientId'];
+  var connection = getConnection();
+  connection.connect();
+
+  var receivables = new Array();
+
+  var query = connection.query('SELECT a.id, firstname, lastname, t.name, starttime, duration, rate, billingpct, paid FROM ' + APPOINTMENT_TABLE + ' a JOIN clientele c on a.client_id = c.id JOIN topic t on a.topic_id = t.id WHERE paid is null order by starttime');
+  query
+    .on('error', function(err) {
+      // Handle error, an 'end' event will be emitted after this as well
+      console.log(err);
+    })
+    .on('fields', function(fields) {
+      // the field packets for the rows to follow
+    })
+    .on('result', function(row) {
+      receivables.push ({
+        'appointment_id': row.id,
+        'firstname': row.firstname,
+        'lastname': row.lastname,
+        'topicname': row.name,
+        'starttime': row.starttime.toLocaleString("en-US"),
+        'duration': row.duration,
+        'rate': row.rate,
+        'billingpct': row.billingpct,
+        'paid': (row.paid ? row.paid.toLocaleDateString("en-US") : ''),
+      });
+    })
+    .on('end', function() {
+      // all rows have been received
+      var jsonMessage = {
+        'receivables': receivables
+      }
+      response.json(jsonMessage);
+    });
+
+  connection.end();
+});
+
 app.get('/', function(request, response) {
   // load the single view file (angular will handle the page changes on the front-end)
 
@@ -177,6 +217,20 @@ app.post('/saveAppointment', function(request, response) {
     if (error) throw error;
     console.log(results.insertId);
     response.json({ 'appointmentId': results.insertId });
+    response.status(200).end();
+  });
+
+});
+
+app.post('/updateAppointment', function(request, response) {
+  var connection = getConnection();
+  connection.connect();
+
+  // JSON elements must match table column names
+  connection.query('UPDATE ' + APPOINTMENT_TABLE + ' SET paid = ? WHERE id = ?', [ request.body['paid'], request.body['id'] ], function (error, results, fields) {
+    if (error) throw error;
+    console.log(results.changedRows);
+    response.json({ 'rowsAffected': results.changedRows });
     response.status(200).end();
   });
 

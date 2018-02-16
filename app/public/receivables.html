@@ -1,0 +1,38 @@
+<div id="receivables" class="receivables-list">
+    <table id="receivableDetailTable">
+      <thead>
+        <tr>
+          <th style="align=center;">Appointment ID</th>
+          <th style="align=center;">Client First</th>
+          <th style="align=center;">Client Last</th>
+          <th style="align=center;">Topic</th>
+          <th style="align=center;">Start time</th>
+          <th style="align=center;">Duration</th>
+          <th style="align=center;">Hourly Rate</th>
+          <th style="align=center;">Billing %</th>
+          <th style="align=center;">Amount Due</th>
+          <th style="align=center;">Paid</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td colspan="10" style="text-align:right">
+            <input type="date" id="datePicker" />
+          </td>
+        </tr>
+        <tr ng-repeat="receivable in receivables">
+          <td style="align:left;">{{ receivable.appointment_id }}</td>
+          <td style="align:left;">{{ receivable.firstname }}</td>
+          <td style="align:left;">{{ receivable.lastname }}</td>
+          <td style="align:left;">{{ receivable.topicname }}</td>
+          <td style="align:left;">{{ receivable.starttime }}</td>
+          <td style="align:left;">{{ receivable.duration }}</td>
+          <td style="align:left;">{{ receivable.rate }}</td>
+          <td style="align:left;">{{ receivable.billingpct }}</td>
+          <td style="align:left;">$ {{ (receivable.rate * (receivable.duration / 60) * receivable.billingpct).toFixed(2) }}</td>
+          <td style="align:left;"><a href ng-click="getPaid(receivable.appointment_id)">Mark Paid</a></td>
+        </tr>
+      </tbody>
+    </table>
+
+</div>

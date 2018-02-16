@@ -13,27 +13,25 @@
 </head>
 <body ng-controller="clientListController">
 
-  <table>
-    <tr>
-      <td>
-        <div>
-          <table>
-            <tr ng-repeat="customer in clients">
-              <td><a href ng-click="selectClient(customer.clientId)">{{ customer.firstname }}</a></td>
-            </tr>
-          </table>
-        </div>
-      </td>
-      <td style="vertical-align:top;">
-        <div ng-include="'client-detail.html'">
-        </div>
-      </td>
-      <td style="vertical-align:top;">
-        <div ng-include="'appointment-detail.html'">
-        </div>
-      </td>
-    </tr>
-  </table>
+  <div class="container">
+    <div id="clientList" class="fixed-narrow-overflow">
+      <table>
+        <tr ng-repeat="customer in clients">
+          <td><a href ng-click="selectClient(customer.clientId)">{{ customer.firstname }}</a></td>
+        </tr>
+      </table>
+    </div>
+
+    <div ng-include="'client-detail.html'" class="fixed-wide">
+    </div>
+
+    <div>
+      <div ng-include="'appointment-detail.html'" class="fixed-overflow">
+      </div>
+      <div ng-include="'receivables.html'">
+      </div>
+    </div>
+  </div>
 
 </body>
 </html>

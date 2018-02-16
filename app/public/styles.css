@@ -10,4 +10,29 @@ table tr:nth-child(odd) {
 table tr:nth-child(even) {
   background-color: #ffffff;
 }
+.container{
+    display: flex;
+}
+.fixed-narrow{
+    width: 100px;
+}
+.fixed-wide{
+    width: 250px;
+}
+.fixed-overflow{
+    overflow-y: auto;
+    height: 300px;
+}
+.flex-item{
+    flex-grow: 1;
+}
+.fixed-narrow-overflow{
+    overflow-y: auto;
+    width: 100px;
+    height: 300px;
+}
+.receivables-list {
+  border-style: solid;
+  border-color: coral;
+}
 </style>
