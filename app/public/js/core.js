@@ -1,59 +1,62 @@
 // angular code runs on the browser
 var clientBizApp = angular.module('clientBizApp', []);
 
+clientBizApp.config(function($routeProvider) {
+  $routeProvider
+    .when('/client', {
+      templateUrl: 'client-list.html',
+      controller: 'clientListController'
+    })
+    .when('/appointments/:clientId', {
+      templateUrl: 'appointment-list.html',
+      controller: 'appointmentListController'
+    });
+});
+
+function appointmentListController($scope, $http, $routeParams) {
+  var clientId = $routeParams['clientId'];
+  $http.get('/appointments/' + clientId)
+    .success(function(data) {
+      $scope.appointments = data.appointments;
+    })
+    .error(function(data) {
+    });
+
+  $http.get('/client/' + clientId)
+    .success(function(data) {
+      // alert(JSON.stringify(data));
+
+/* TODO Use for new appointment
+      $scope.formData = {
+        'client_id': data.client.clientId,
+        'topic_id': "2",
+        'starttime': nextHour.toJSON().slice(0,16),
+        'duration': 60,
+        'rate': 60,
+        'billingpct': 0.75
+      };
+*/
+      $scope.client = {
+        'client_id': data.client.clientId,
+        'firstname': data.client.firstname,
+        'lastname': data.client.lastname,
+        'contactname': data.client.contactname,
+        'city': data.client.city,
+        'state': data.client.state,
+        'timezone': data.client.timezone,
+        'firstcontact': data.client.firstcontact,
+        'firstresponse': data.client.firstresponse,
+        'solicited': !!+data.client.solicited
+      };
+
+    })
+    .error(function(data) {
+    });
+}
+
 function clientListController($scope, $http) {
   $scope.formData = {};
   $scope.updateAppointmentData = {};
-
-  $scope.selectClient = function(clientId) {
-    if (!clientId) {
-      console.log('No client selected');
-      return;
-    }
-
-    $http.get('/client/' + clientId)
-      .success(function(data) {
-        // alert(JSON.stringify(data));
-
-        // Advance to next hour
-        var date = new Date();
-        var nextHour = new Date(date.getTime() - (date.getTimezoneOffset() * 60000));
-        nextHour.setMinutes(0);
-        nextHour.setHours(nextHour.getHours() + 1);
-        $('#datePicker').val(nextHour.toJSON().slice(0,10));
-
-        $scope.formData = {
-          'client_id': data.client.clientId,
-          'topic_id': "2",
-          'starttime': nextHour.toJSON().slice(0,16),
-          'duration': 60,
-          'rate': 60,
-          'billingpct': 0.75
-        };
-
-        $scope.client = {
-          'client_id': data.client.clientId,
-          'firstname': data.client.firstname,
-          'lastname': data.client.lastname,
-          'contactname': data.client.contactname,
-          'city': data.client.city,
-          'state': data.client.state,
-          'timezone': data.client.timezone,
-          'firstcontact': data.client.firstcontact,
-          'firstresponse': data.client.firstresponse,
-          'solicited': !!+data.client.solicited
-        };
-      })
-      .error(function(data) {
-      });
-
-      $http.get('/appointments/' + clientId)
-        .success(function(data) {
-          $scope.appointments = data.appointments;
-        })
-        .error(function(data) {
-        });
-  }
 
   $http.get('/client')
     .success(function(data) {

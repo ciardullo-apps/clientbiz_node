@@ -23,7 +23,7 @@ app.get('/client', function(request, response) {
 
   var clients = new Array();
 
-  var query = connection.query('SELECT id, firstname, lastname FROM clientele ORDER BY firstresponse desc, firstname, lastname');
+  var query = connection.query('SELECT id, firstname, lastname, contactname, timezone, solicited, numappts, lastapptdate FROM clientview ORDER BY lastapptyearmonth desc, numappts desc');
   query
     .on('error', function(err) {
       // Handle error, an 'end' event will be emitted after this as well
@@ -34,8 +34,14 @@ app.get('/client', function(request, response) {
     })
     .on('result', function(row) {
       clients.push ({
-        'clientId': row.id,
-        'firstname': row.firstname
+        'id': row.id,
+        'firstname': row.firstname,
+        'lastname': row.lastname,
+        'contactname': row.contactname,
+        'timezone': row.timezone,
+        'solicited': row.solicited,
+        'numappts': row.numappts,
+        'lastapptdate': row.lastapptdate.toJSON().slice(0,10)
       });
     })
     .on('end', function() {
