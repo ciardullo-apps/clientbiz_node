@@ -41,7 +41,7 @@ app.get('/client', function(request, response) {
         'timezone': row.timezone,
         'solicited': row.solicited,
         'numappts': row.numappts,
-        'lastapptdate': row.lastapptdate.toJSON().slice(0,10)
+        'lastapptdate': (row.lastapptdate ? row.lastapptdate.toJSON().slice(0,10) : "")
       });
     })
     .on('end', function() {
@@ -49,7 +49,7 @@ app.get('/client', function(request, response) {
       var jsonMessage = {
         'clients': clients
       }
-      response.json(jsonMessage);
+      response.json(clients);
     });
 
   connection.end();
@@ -72,8 +72,9 @@ app.get('/topics', function(request, response) {
     })
     .on('result', function(row) {
       // Need to convert row.id toString to support ng-options in appointment-detail
+      // 'id': row.id.toString(),
       topics.push ({
-        'topicId': row.id.toString(),
+        'id': row.id,
         'topicName': row.name
       });
     })
@@ -206,12 +207,6 @@ app.get('/receivables', function(request, response) {
     });
 
   connection.end();
-});
-
-app.get('/', function(request, response) {
-  // load the single view file (angular will handle the page changes on the front-end)
-
-  response.sendfile('./public/index.html');
 });
 
 app.post('/saveAppointment', function(request, response) {
