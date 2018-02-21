@@ -14,12 +14,15 @@ clientBizApp.config(function($routeProvider) {
     .when('/addAppointment/:clientId', {
       templateUrl: 'create-appointment.html',
       controller: 'createAppointmentController'
+    })
+    .when('/receivables', {
+      templateUrl: 'receivables.html',
+      controller: 'receivablesController'
     });
 });
 
 function clientListController($scope, $http) {
   $scope.formData = {};
-  $scope.updateAppointmentData = {};
   $http.get('/client')
     .success(function(data) {
           $scope.clients = data;
@@ -33,37 +36,6 @@ function clientListController($scope, $http) {
     })
     .error(function(data) {
     });
-
-  $http.get('/receivables')
-    .success(function(data) {
-      $scope.receivables = data.receivables;
-    })
-    .error(function(data) {
-    });
-
-  $scope.getPaid = function(appointmentId) {
-    $scope.updateAppointmentData["id"] = appointmentId;
-    $scope.updateAppointmentData["paid"] = $('#datePicker').val();
-
-    $http({
-        method: 'POST',
-        url: '/updateAppointment',
-        data: $.param($scope.updateAppointmentData),
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded'
-        }
-      })
-      .success(function(data) {
-        console.log(data);
-        $http.get('/appointments/' + $scope.formData['client_id'])
-          .success(function(data) {
-            $scope.appointments = data.appointments;
-          })
-          .error(function(data) {
-          });
-      });
-  }
-
 }
 
 function appointmentListController($scope, $http, $routeParams) {
@@ -161,5 +133,37 @@ function createAppointmentController($scope, $http, $routeParams) {
       });
 
   }
+}
 
+function receivablesController($scope, $http, $routeParams) {
+  $scope.updateAppointmentData = {};
+
+  // Default to today
+  var date = new Date();
+  var nextHour = new Date(date.getTime() - (date.getTimezoneOffset() * 60000));
+
+  $http.get('/receivables')
+    .success(function(data) {
+      $scope.receivables = data.receivables;
+      $scope.paiddate =  nextHour.toJSON().slice(0,10);
+    })
+    .error(function(data) {
+    });
+
+  $scope.getPaid = function(appointmentId) {
+    $scope.updateAppointmentData["id"] = appointmentId;
+    $scope.updateAppointmentData["paid"] = $scope.paiddate ;
+
+    $http({
+        method: 'POST',
+        url: '/updatePaidDate',
+        data: $.param($scope.updateAppointmentData),
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded'
+        }
+      })
+      .success(function(data) {
+        console.log(data);
+      });
+  }
 }

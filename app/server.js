@@ -223,7 +223,7 @@ app.post('/saveAppointment', function(request, response) {
 
 });
 
-app.post('/updateAppointment', function(request, response) {
+app.post('/updatePaidDate', function(request, response) {
   var connection = getConnection();
   connection.connect();
 
@@ -234,7 +234,6 @@ app.post('/updateAppointment', function(request, response) {
     response.json({ 'rowsAffected': results.changedRows });
     response.status(200).end();
   });
-
 });
 
 function getConnection() {
