@@ -18,7 +18,12 @@ clientBizApp.config(function($routeProvider) {
     .when('/receivables', {
       templateUrl: 'receivables.html',
       controller: 'receivablesController'
-    });
+    })
+    .when('/addClient', {
+      templateUrl: 'create-client.html',
+      controller: 'createClientController'
+    })
+;
 });
 
 function clientListController($scope, $http) {
@@ -165,5 +170,44 @@ function receivablesController($scope, $http, $routeParams) {
       .success(function(data) {
         console.log(data);
       });
+  }
+}
+
+function createClientController($scope, $http, $routeParams) {
+  // var clientId = $routeParams['clientId'];
+  var topics = { };
+  $http.get('/topics')
+    .success(function(data) {
+      $scope.topics = data.topics;
+    })
+    .error(function(data) {
+  });
+
+  // Advance to next hour
+  var date = new Date();
+  var nextHour = new Date(date.getTime() - (date.getTimezoneOffset() * 60000));
+  nextHour.setMinutes(0);
+  nextHour.setHours(nextHour.getHours() + 1);
+
+  $scope.formData = {
+    'topic_id': 2,
+    'firstcontact': nextHour.toJSON().slice(0,16),
+    'firstresponse': nextHour.toJSON().slice(0,16),
+    'solicited': "1"
+  };
+
+  $scope.saveClient = function() {
+    $http({
+        method: 'POST',
+        url: '/saveClient',
+        data: $.param($scope.formData),
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded'
+        }
+      })
+      .success(function(data) {
+        console.log(data);
+      });
+
   }
 }

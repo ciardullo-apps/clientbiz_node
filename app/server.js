@@ -236,6 +236,51 @@ app.post('/updatePaidDate', function(request, response) {
   });
 });
 
+app.post('/saveClient', function(request, response) {
+  console.log(request.body);
+  var topicId = request.body.topic_id;
+  delete request.body.topic_id;
+
+  var connection = getConnection();
+  connection.connect();
+
+  // JSON elements must match table column names
+  connection.beginTransaction(function(err) {
+    if (err) { throw err; }
+    connection.query('INSERT INTO clientele SET ?', request.body, function (error, result, fields) {
+      if (error) {
+        connection.rollback(function() {
+          throw err;
+        });
+      }
+
+      var clientId = result.insertId;
+      console.log('Client ID: ' + clientId);
+
+      var clientTopic = { 'client_id': clientId, 'topic_id': topicId }
+
+      connection.query('INSERT INTO clienttopic SET ?', clientTopic, function (error, results, fields) {
+        if (error) {
+          connection.rollback(function() {
+            throw err;
+          });
+        }
+        connection.commit(function(err) {
+          if (err) {
+            connection.rollback(function() {
+              throw err;
+            });
+          }
+          console.log('Transaction Complete.');
+          connection.end();
+          response.json({ 'clientId': clientId });
+          response.status(200).end();
+        });
+      });
+    });
+  });
+});
+
 function getConnection() {
   return mysql.createConnection({
     host     : 'localhost',

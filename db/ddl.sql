@@ -27,7 +27,7 @@ CREATE TABLE IF NOT EXISTS `clientbiz`.`clientele` (
   `timezone` VARCHAR(45) NOT NULL,
   `firstcontact` DATETIME NULL,
   `firstresponse` DATETIME NOT NULL,
-  `solicited` VARCHAR(45) NOT NULL DEFAULT 0,
+  `solicited` BOOLEAN NOT NULL DEFAULT 0,
   PRIMARY KEY (`id`))
 ENGINE = InnoDB;
 

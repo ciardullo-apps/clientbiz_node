@@ -1,0 +1,68 @@
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-2 mb-3 border-bottom">
+  <h1 class="h2">New Client</h1>
+  <div class="btn-toolbar mb-2 mb-md-0">
+    <div class="btn-group mr-2">
+      <button class="btn btn-sm btn-outline-secondary">Share</button>
+      <button class="btn btn-sm btn-outline-secondary">Export</button>
+    </div>
+    <button class="btn btn-sm btn-outline-secondary dropdown-toggle">
+      <span data-feather="calendar"></span>
+      Recent
+    </button>
+  </div>
+</div>
+
+<div id="createClient" class="table-responsive">
+    <table id="clientDetailTable" ng-form="clientDetail" class="table table-striped table-sm">
+      <tbody>
+        <tr>
+          <td style="align=right;">First name:</td>
+          <td style="align:left;"><input name="firstname" ng-model="formData.firstname" type="text" /></td>
+        </tr>
+        <tr>
+          <td style="align=right;">Last name:</td>
+          <td style="align:left;"><input name="lastname" ng-model="formData.lastname" type="text" /></td>
+        </tr>
+        <tr>
+          <td style="align=right;">Topic:</td>
+          <td style="align:left;">
+            <select name="topic_id" ng-model="formData.topic_id" ng-options="topic.id as topic.topicName for topic in topics" >
+            </select>
+          </td>
+        </tr>
+        <tr>
+          <td style="align=right;">Contact name:</td>
+          <td style="align:left;"><input name="contactname" ng-model="formData.contactname" type="text" /></td>
+        </tr>
+        <tr>
+          <td style="align=right;">City:</td>
+          <td style="align:left;"><input name="city" ng-model="formData.city" type="text" /></td>
+        </tr>
+        <tr>
+          <td style="align=right;">State:</td>
+          <td style="align:left;"><input name="state" ng-model="formData.state" type="text" /></td>
+        </tr>
+        <tr>
+          <td style="align=right;">Timezone:</td>
+          <td style="align:left;"><input name="timezone" ng-model="formData.timezone" type="text" /></td>
+        </tr>
+        <tr>
+          <td style="align=right;">First contacted:</td>
+          <td style="align:left;"><input name="firstcontact" ng-model="formData.firstcontact" type="datetime-local" /></td>
+        </tr>
+        <tr>
+          <td style="align=right;">First responded:</td>
+          <td style="align:left;"><input name="firstresponse" ng-model="formData.firstresponse" type="datetime-local" /></td>
+        </tr>
+        <tr>
+          <td style="align=right;">Solicited:</td>
+          <td style="align:left;"><input name="solicited" ng-model="formData.solicited" ng-true-value="1" ng-true-value="0" type="checkbox" /></td>
+        </tr>
+        <tr>
+          <td style="align=right;">&nbsp;</td>
+          <td style="align:left;"><input type="button" value="Save" ng-click="saveClient()" /></td>
+        </tr>
+      </tbody>
+    </table>
+
+</div>
