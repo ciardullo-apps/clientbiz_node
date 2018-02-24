@@ -114,8 +114,8 @@ app.get('/client/:clientId', function(request, response) {
         'city': row.city,
         'state': row.state,
         'timezone': row.timezone,
-        'firstcontact': (row.firstcontact ? row.firstcontact.toLocaleString("en-US") : ''),
-        'firstresponse': row.firstresponse.toLocaleString("en-US"),
+        'firstcontact': (row.firstcontact ? row.firstcontact.toJSON().slice(0,16) : ''),
+        'firstresponse': row.firstresponse.toJSON().slice(0,16),
         'solicited': row.solicited
       };
     })
@@ -241,26 +241,68 @@ app.post('/saveClient', function(request, response) {
   var topicId = request.body.topic_id;
   delete request.body.topic_id;
 
+  if (request.body.solicited == 'true') {
+    console.log("true");
+    request.body['solicited'] = true;
+  } else {
+    console.log("false");
+    request.body['solicited'] = false;
+    request.body['firstcontact'] = null
+  }
+
   var connection = getConnection();
   connection.connect();
 
-  // JSON elements must match table column names
-  connection.beginTransaction(function(err) {
-    if (err) { throw err; }
-    connection.query('INSERT INTO clientele SET ?', request.body, function (error, result, fields) {
-      if (error) {
-        connection.rollback(function() {
-          throw err;
-        });
-      }
-
-      var clientId = result.insertId;
-      console.log('Client ID: ' + clientId);
-
-      var clientTopic = { 'client_id': clientId, 'topic_id': topicId }
-
-      connection.query('INSERT INTO clienttopic SET ?', clientTopic, function (error, results, fields) {
+  if(!request.body.client_id) {
+    // JSON elements must match table column names
+    connection.beginTransaction(function(err) {
+      if (err) { throw err; }
+      connection.query('INSERT INTO clientele SET ?', request.body, function (error, result, fields) {
         if (error) {
+          connection.rollback(function() {
+            throw err;
+          });
+        }
+
+        var clientId = result.insertId;
+        console.log('Client ID: ' + clientId);
+
+        var clientTopic = { 'client_id': clientId, 'topic_id': topicId }
+
+        connection.query('INSERT INTO clienttopic SET ?', clientTopic, function (error, results, fields) {
+          if (error) {
+            connection.rollback(function() {
+              throw err;
+            });
+          }
+          connection.commit(function(err) {
+            if (err) {
+              connection.rollback(function() {
+                throw err;
+              });
+            }
+            console.log('Transaction Complete.');
+            connection.end();
+            response.json({ 'clientId': clientId });
+            response.status(200).end();
+          });
+        });
+      });
+    });
+  } else {
+    connection.beginTransaction(function(err) {
+      var clientId = request.body.client_id;
+      delete request.body.client_id;
+      if (err) { throw err; }
+      var query = connection.query('UPDATE clientele SET ? WHERE id = ?', [request.body, +clientId], function (error, result, fields) {
+        console.log(query.sql);
+        if (error) {
+          connection.rollback(function() {
+            throw err;
+          });
+        }
+        if (result.affectedRows > 1) {
+          console.log("Too many rows updated");
           connection.rollback(function() {
             throw err;
           });
@@ -273,12 +315,12 @@ app.post('/saveClient', function(request, response) {
           }
           console.log('Transaction Complete.');
           connection.end();
-          response.json({ 'clientId': clientId });
+          response.json({ 'rowsAffected': result.affectedRows });
           response.status(200).end();
         });
       });
     });
-  });
+  }
 });
 
 function getConnection() {

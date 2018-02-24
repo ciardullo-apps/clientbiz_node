@@ -19,9 +19,13 @@ clientBizApp.config(function($routeProvider) {
       templateUrl: 'receivables.html',
       controller: 'receivablesController'
     })
+    .when('/client/:clientId', {
+      templateUrl: 'edit-client.html',
+      controller: 'editClientController'
+    })
     .when('/addClient', {
-      templateUrl: 'create-client.html',
-      controller: 'createClientController'
+      templateUrl: 'edit-client.html',
+      controller: 'editClientController'
     })
 ;
 });
@@ -173,8 +177,8 @@ function receivablesController($scope, $http, $routeParams) {
   }
 }
 
-function createClientController($scope, $http, $routeParams) {
-  // var clientId = $routeParams['clientId'];
+function editClientController($scope, $http, $routeParams) {
+  var clientId = $routeParams['clientId'];
   var topics = { };
   $http.get('/topics')
     .success(function(data) {
@@ -189,12 +193,35 @@ function createClientController($scope, $http, $routeParams) {
   nextHour.setMinutes(0);
   nextHour.setHours(nextHour.getHours() + 1);
 
-  $scope.formData = {
-    'topic_id': 2,
-    'firstcontact': nextHour.toJSON().slice(0,16),
-    'firstresponse': nextHour.toJSON().slice(0,16),
-    'solicited': "1"
-  };
+  if (clientId) {
+    $http.get('/client/' + clientId)
+      .success(function(data) {
+        // alert(JSON.stringify(data));
+        $scope.formData = {
+          'client_id': data.client.clientId,
+          'firstname': data.client.firstname,
+          'lastname': data.client.lastname,
+          'contactname': data.client.contactname,
+          'city': data.client.city,
+          'state': data.client.state,
+          'timezone': data.client.timezone,
+          'firstcontact': data.client.firstcontact,
+          'firstresponse': data.client.firstresponse,
+          'solicited': !!+data.client.solicited
+        };
+
+      })
+      .error(function(data) {
+      });
+
+  } else {
+    $scope.formData = {
+      'topic_id': 2,
+      'firstcontact': nextHour.toJSON().slice(0,16),
+      'firstresponse': nextHour.toJSON().slice(0,16),
+      'solicited': "1"
+    };
+  }
 
   $scope.saveClient = function() {
     $http({
