@@ -114,11 +114,11 @@ app.get('/appointments/:clientId', function(request, response) {
         'id': row.id,
         'client_id': row.client_id,
         'topic_id': row.topic_id,
-        'starttime': row.starttime.toLocaleString("en-US"),
+        'starttime': row.starttime.toLocaleString("en-US", { timeZone: 'UTC' }),
         'duration': row.duration,
         'rate': row.rate,
         'billingpct': row.billingpct,
-        'paid': (row.paid ? row.paid.toLocaleDateString("en-US") : ''),
+        'paid': (row.paid ? row.paid.toLocaleString("en-US", { timeZone: 'UTC' }) : ''),
       });
     })
     .on('end', function() {
@@ -185,11 +185,11 @@ app.get('/receivables', function(request, response) {
         'firstname': row.firstname,
         'lastname': row.lastname,
         'topicname': row.name,
-        'starttime': row.starttime.toLocaleString("en-US"),
+        'starttime': row.starttime.toLocaleString("en-US", { timeZone: 'UTC' }),
         'duration': row.duration,
         'rate': row.rate,
         'billingpct': row.billingpct,
-        'paid': (row.paid ? row.paid.toLocaleDateString("en-US") : ''),
+        'paid': (row.paid ? row.paid.toLocaleString("en-US", { timeZone: 'UTC' }) : ''),
       });
     })
     .on('end', function() {
@@ -233,10 +233,8 @@ app.post('/saveClient', function(request, response) {
   delete request.body.topic_id;
 
   if (request.body.solicited == 'true') {
-    console.log("true");
     request.body['solicited'] = true;
   } else {
-    console.log("false");
     request.body['solicited'] = false;
     request.body['firstcontact'] = null
   }
@@ -320,6 +318,6 @@ function getConnection() {
     user     : 'john',
     password : 'test',
     database : 'clientbiz',
-    timezone: 'local'
+    timezone: 'utc'
   });
 }
