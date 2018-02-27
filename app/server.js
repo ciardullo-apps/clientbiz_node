@@ -55,40 +55,6 @@ app.get('/client', function(request, response) {
   connection.end();
 });
 
-app.get('/topics', function(request, response) {
-  var connection = getConnection();
-  connection.connect();
-
-  var topics = new Array();
-
-  var topicQuery = connection.query('SELECT id, name FROM topic ORDER BY id');
-  topicQuery
-    .on('error', function(err) {
-      // Handle error, an 'end' event will be emitted after this as well
-      console.log(err);
-    })
-    .on('fields', function(fields) {
-      // the field packets for the rows to follow
-    })
-    .on('result', function(row) {
-      // Need to convert row.id toString to support ng-options in appointment-detail
-      // 'id': row.id.toString(),
-      topics.push ({
-        'id': row.id,
-        'topicName': row.name
-      });
-    })
-    .on('end', function() {
-      // all rows have been received
-      var jsonMessage = {
-        'topics': topics
-      }
-      response.json(jsonMessage);
-    });
-
-  connection.end();
-});
-
 app.get('/client/:clientId', function(request, response) {
   var clientId = request.params['clientId'];
   var connection = getConnection();
@@ -121,10 +87,7 @@ app.get('/client/:clientId', function(request, response) {
     })
     .on('end', function() {
       // all rows have been received
-      var jsonMessage = {
-        'client': client
-      }
-      response.json(jsonMessage);
+      response.json(client);
     });
 
   connection.end();
@@ -148,7 +111,7 @@ app.get('/appointments/:clientId', function(request, response) {
     })
     .on('result', function(row) {
       appointments.push ({
-        'appointment_id': row.id,
+        'id': row.id,
         'client_id': row.client_id,
         'topic_id': row.topic_id,
         'starttime': row.starttime.toLocaleString("en-US"),
@@ -160,8 +123,39 @@ app.get('/appointments/:clientId', function(request, response) {
     })
     .on('end', function() {
       // all rows have been received
+      response.json(appointments);
+    });
+
+  connection.end();
+});
+
+app.get('/topics', function(request, response) {
+  var connection = getConnection();
+  connection.connect();
+
+  var topics = new Array();
+
+  var topicQuery = connection.query('SELECT id, name FROM topic ORDER BY id');
+  topicQuery
+    .on('error', function(err) {
+      // Handle error, an 'end' event will be emitted after this as well
+      console.log(err);
+    })
+    .on('fields', function(fields) {
+      // the field packets for the rows to follow
+    })
+    .on('result', function(row) {
+      // Need to convert row.id toString to support ng-options in appointment-detail
+      // 'id': row.id.toString(),
+      topics.push ({
+        'id': row.id,
+        'topicName': row.name
+      });
+    })
+    .on('end', function() {
+      // all rows have been received
       var jsonMessage = {
-        'appointments': appointments
+        'topics': topics
       }
       response.json(jsonMessage);
     });
@@ -200,10 +194,7 @@ app.get('/receivables', function(request, response) {
     })
     .on('end', function() {
       // all rows have been received
-      var jsonMessage = {
-        'receivables': receivables
-      }
-      response.json(jsonMessage);
+      response.json(receivables);
     });
 
   connection.end();

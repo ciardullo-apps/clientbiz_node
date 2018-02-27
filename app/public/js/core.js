@@ -51,7 +51,7 @@ function appointmentListController($scope, $http, $routeParams) {
   var clientId = $routeParams['clientId'];
   $http.get('/appointments/' + clientId)
     .success(function(data) {
-      $scope.appointments = data.appointments;
+      $scope.appointments = data;
     })
     .error(function(data) {
     });
@@ -68,16 +68,16 @@ function appointmentListController($scope, $http, $routeParams) {
       // alert(JSON.stringify(data));
 
       $scope.client = {
-        'client_id': data.client.clientId,
-        'firstname': data.client.firstname,
-        'lastname': data.client.lastname,
-        'contactname': data.client.contactname,
-        'city': data.client.city,
-        'state': data.client.state,
-        'timezone': data.client.timezone,
-        'firstcontact': data.client.firstcontact,
-        'firstresponse': data.client.firstresponse,
-        'solicited': !!+data.client.solicited
+        'client_id': data.clientId,
+        'firstname': data.firstname,
+        'lastname': data.lastname,
+        'contactname': data.contactname,
+        'city': data.city,
+        'state': data.state,
+        'timezone': data.timezone,
+        'firstcontact': data.firstcontact,
+        'firstresponse': data.firstresponse,
+        'solicited': !!+data.solicited
       };
 
     })
@@ -134,7 +134,7 @@ function createAppointmentController($scope, $http, $routeParams) {
         console.log(data);
         $http.get('/appointments/' + $scope.formData['client_id'])
           .success(function(data) {
-            $scope.appointments = data.appointments;
+            $scope.appointments = data;
           })
           .error(function(data) {
           });
@@ -153,7 +153,7 @@ function receivablesController($scope, $http, $routeParams) {
 
   $http.get('/receivables')
     .success(function(data) {
-      $scope.receivables = data.receivables;
+      $scope.receivables = data;
       $scope.paiddate =  nextHour.toJSON().slice(0,10);
     })
     .error(function(data) {
@@ -198,16 +198,16 @@ function editClientController($scope, $http, $routeParams) {
       .success(function(data) {
         // alert(JSON.stringify(data));
         $scope.formData = {
-          'client_id': data.client.clientId,
-          'firstname': data.client.firstname,
-          'lastname': data.client.lastname,
-          'contactname': data.client.contactname,
-          'city': data.client.city,
-          'state': data.client.state,
-          'timezone': data.client.timezone,
-          'firstcontact': data.client.firstcontact,
-          'firstresponse': data.client.firstresponse,
-          'solicited': !!+data.client.solicited
+          'id': data.clientId,
+          'firstname': data.firstname,
+          'lastname': data.lastname,
+          'contactname': data.contactname,
+          'city': data.city,
+          'state': data.state,
+          'timezone': data.timezone,
+          'firstcontact': data.firstcontact,
+          'firstresponse': data.firstresponse,
+          'solicited': !!+data.solicited
         };
 
       })
