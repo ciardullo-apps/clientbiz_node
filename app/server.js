@@ -12,219 +12,213 @@ app.listen(8080);
 
 console.log('Application listening on port 8080');
 
-var mysql = require('mysql');
+var bookshelf = require('./bookshelf');
 
-const APPOINTMENT_TABLE = 'appointment';
+// Relations
+var Topic = bookshelf.Model.extend({
+  tableName: 'topic',
+  appointments: function() {
+    return this.belongsTo(Appointment, 'topic_id')
+  }
+});
+
+var Clientele = bookshelf.Model.extend({
+  tableName: 'clientele',
+  appointments: function() {
+    return this.belongsTo(Appointment, 'client_id');
+  }
+});
+
+var ClientView = bookshelf.Model.extend({
+  tableName: 'clientview'
+});
+
+var Appointment = bookshelf.Model.extend({
+  tableName: 'appointment',
+  client: function() {
+    return this.hasOne(Clientele, 'id', 'client_id');
+  },
+  topic: function() {
+    return this.hasOne(Topic, 'id', 'topic_id');
+  }
+  // constructor: function() {
+  //   bookshelf.Model.apply(this, arguments);
+  //   this.on("updated", function(model, affectedRows, options) {
+  //     throw "Too many rows updated";
+  //   })
+  // }
+});
+
+var ClientTopic = bookshelf.Model.extend({
+  tableName: 'clienttopic'
+});
+
 
 // Routes
 app.get('/client', function(request, response) {
-  var connection = getConnection();
-  connection.connect();
-
   var clients = new Array();
-
-  var query = connection.query('SELECT id, firstname, lastname, contactname, timezone, solicited, numappts, lastapptdate FROM clientview ORDER BY lastapptyearmonth desc, numappts desc');
-  query
-    .on('error', function(err) {
-      // Handle error, an 'end' event will be emitted after this as well
-      console.log(err);
-    })
-    .on('fields', function(fields) {
-      // the field packets for the rows to follow
-    })
-    .on('result', function(row) {
+  new ClientView().orderBy('lastapptyearmonth', 'DESC')
+  .orderBy('numappts', 'DESC')
+  .fetchAll().then(function(rows) {
+    rows.forEach(function (model) {
       clients.push ({
-        'id': row.id,
-        'firstname': row.firstname,
-        'lastname': row.lastname,
-        'contactname': row.contactname,
-        'timezone': row.timezone,
-        'solicited': row.solicited,
-        'numappts': row.numappts,
-        'lastapptdate': (row.lastapptdate ? row.lastapptdate.toJSON().slice(0,10) : "")
+        'id': model.get('id'),
+        'firstname': model.get('firstname'),
+        'lastname': model.get('lastname'),
+        'contactname': model.get('contactname'),
+        'timezone': model.get('timezone'),
+        'solicited': model.get('solicited'),
+        'numappts': model.get('numappts'),
+        'lastapptdate': (model.get('lastapptdate') ? model.get('lastapptdate').toJSON().slice(0,10) : "")
       });
-    })
-    .on('end', function() {
-      // all rows have been received
-      var jsonMessage = {
-        'clients': clients
-      }
-      response.json(clients);
     });
-
-  connection.end();
+    response.json(clients);
+    response.status(200).end();
+    // response.json(rows.serialize());
+  })
+  .catch(function(error) {
+    console.error(error);
+  });
 });
 
 app.get('/client/:clientId', function(request, response) {
   var clientId = request.params['clientId'];
-  var connection = getConnection();
-  connection.connect();
 
   var client = null;
 
-  var query = connection.query('SELECT id, firstname, lastname, contactname, city, state, timezone, firstcontact, firstresponse, solicited FROM clientele WHERE id = ' + clientId);
-  query
-    .on('error', function(err) {
-      // Handle error, an 'end' event will be emitted after this as well
-      console.log(err);
-    })
-    .on('fields', function(fields) {
-      // the field packets for the rows to follow
-    })
-    .on('result', function(row) {
+  new Clientele().where('id', clientId)
+  .fetch().then(function(model) {
       client = {
-        'clientId': row.id,
-        'firstname': row.firstname,
-        'lastname': row.lastname,
-        'contactname': row.contactname,
-        'city': row.city,
-        'state': row.state,
-        'timezone': row.timezone,
-        'firstcontact': (row.firstcontact ? row.firstcontact.toJSON().slice(0,16) : ''),
-        'firstresponse': row.firstresponse.toJSON().slice(0,16),
-        'solicited': row.solicited
-      };
-    })
-    .on('end', function() {
-      // all rows have been received
+        'clientId': model.get('id'),
+        'firstname': model.get('firstname'),
+        'lastname': model.get('lastname'),
+        'contactname': model.get('contactname'),
+        'city': model.get('city'),
+        'state': model.get('state'),
+        'timezone': model.get('timezone'),
+        'firstcontact': (model.get('firstcontact') ? model.get('firstcontact').toJSON().slice(0,16) : ''),
+        'firstresponse': model.get('firstresponse').toJSON().slice(0,16),
+        'solicited': model.get('solicited')
+      }
       response.json(client);
-    });
-
-  connection.end();
+      response.status(200).end();
+    // response.json(rows.serialize());
+  })
+  .catch(function(error) {
+    console.error(error);
+  });
 });
 
 app.get('/appointments/:clientId', function(request, response) {
   let clientId = request.params['clientId'];
-  var connection = getConnection();
-  connection.connect();
 
   var appointments = new Array();
 
-  var query = connection.query('SELECT id, client_id, topic_id, starttime, duration, rate, billingpct, paid FROM ' + APPOINTMENT_TABLE + ' WHERE client_id = ' + clientId);
-  query
-    .on('error', function(err) {
-      // Handle error, an 'end' event will be emitted after this as well
-      console.log(err);
-    })
-    .on('fields', function(fields) {
-      // the field packets for the rows to follow
-    })
-    .on('result', function(row) {
-      appointments.push ({
-        'id': row.id,
-        'client_id': row.client_id,
-        'topic_id': row.topic_id,
-        'starttime': row.starttime.toLocaleString("en-US", { timeZone: 'UTC' }),
-        'duration': row.duration,
-        'rate': row.rate,
-        'billingpct': row.billingpct,
-        'paid': (row.paid ? row.paid.toLocaleString("en-US", { timeZone: 'UTC' }) : ''),
+  new Appointment()
+    .where('client_id', clientId)
+    .orderBy('starttime', 'ASC')
+    .fetchAll().then(function(rows) {
+      rows.forEach(function (model) {
+        appointments.push ({
+          'id': model.get('id'),
+          'client_id': model.get('client_id'),
+          'topic_id': model.get('topic_id'),
+          'starttime': model.get('starttime').toLocaleString("en-US", { timeZone: 'UTC' }),
+          'duration': model.get('duration'),
+          'rate': model.get('rate'),
+          'billingpct': model.get('billingpct'),
+          'paid': (model.get('paid') ? model.get('paid').toLocaleString("en-US", { timeZone: 'UTC' }) : '')
+        });
       });
-    })
-    .on('end', function() {
-      // all rows have been received
       response.json(appointments);
+      response.status(200).end();
+    })
+    .catch(function(error) {
+      console.error(error);
     });
 
-  connection.end();
 });
 
 app.get('/topics', function(request, response) {
-  var connection = getConnection();
-  connection.connect();
-
   var topics = new Array();
 
-  var topicQuery = connection.query('SELECT id, name FROM topic ORDER BY id');
-  topicQuery
-    .on('error', function(err) {
-      // Handle error, an 'end' event will be emitted after this as well
-      console.log(err);
-    })
-    .on('fields', function(fields) {
-      // the field packets for the rows to follow
-    })
-    .on('result', function(row) {
-      // Need to convert row.id toString to support ng-options in appointment-detail
-      // 'id': row.id.toString(),
+  new Topic().orderBy('id', 'ASC')
+  .fetchAll().then(function(rows) {
+    rows.forEach(function (model) {
       topics.push ({
-        'id': row.id,
-        'topicName': row.name
+        'id': model.get('id'),
+        'topicName': model.get('name')
       });
-    })
-    .on('end', function() {
-      // all rows have been received
-      var jsonMessage = {
-        'topics': topics
-      }
-      response.json(jsonMessage);
     });
-
-  connection.end();
+    var jsonMessage = {
+      'topics': topics
+    }
+    response.json(jsonMessage);
+    response.status(200).end();
+  })
+  .catch(function(error) {
+    console.error(error);
+  });
 });
 
 app.get('/receivables', function(request, response) {
   let clientId = request.params['clientId'];
-  var connection = getConnection();
-  connection.connect();
 
   var receivables = new Array();
 
-  var query = connection.query('SELECT a.id, firstname, lastname, t.name, starttime, duration, rate, billingpct, paid FROM ' + APPOINTMENT_TABLE + ' a JOIN clientele c on a.client_id = c.id JOIN topic t on a.topic_id = t.id WHERE paid is null order by starttime');
-  query
-    .on('error', function(err) {
-      // Handle error, an 'end' event will be emitted after this as well
-      console.log(err);
+  new Appointment()
+    .where({ paid: null})
+    .fetchAll({withRelated: ['client.appointments','topic.appointments']})
+    .then(function(rows) {
+      rows.toJSON().forEach(function(model) {
+        receivables.push ({
+          'appointment_id': model.id,
+          'firstname': model.client.firstname,
+          'lastname': model.client.lastname,
+          'topicname': model.topic.name,
+          'starttime': model.starttime.toLocaleString("en-US", { timeZone: 'UTC' }),
+          'duration': model.duration,
+          'rate': model.rate,
+          'billingpct': model.billingpct,
+          'paid': (model.paid ? model.paid.toLocaleString("en-US", { timeZone: 'UTC' }) : ''),
+      })
     })
-    .on('fields', function(fields) {
-      // the field packets for the rows to follow
-    })
-    .on('result', function(row) {
-      receivables.push ({
-        'appointment_id': row.id,
-        'firstname': row.firstname,
-        'lastname': row.lastname,
-        'topicname': row.name,
-        'starttime': row.starttime.toLocaleString("en-US", { timeZone: 'UTC' }),
-        'duration': row.duration,
-        'rate': row.rate,
-        'billingpct': row.billingpct,
-        'paid': (row.paid ? row.paid.toLocaleString("en-US", { timeZone: 'UTC' }) : ''),
-      });
-    })
-    .on('end', function() {
-      // all rows have been received
-      response.json(receivables);
-    });
 
-  connection.end();
+      response.json(receivables);
+      response.status(200).end();
+    })
+    .catch(function(err) {
+      console.error(err);
+    });
 });
 
 app.post('/saveAppointment', function(request, response) {
-  var connection = getConnection();
-  connection.connect();
 
-  // JSON elements must match table column names
-  connection.query('INSERT INTO ' + APPOINTMENT_TABLE + ' SET ?', request.body, function (error, results, fields) {
-    if (error) throw error;
-    console.log(results.insertId);
-    response.json({ 'appointmentId': results.insertId });
-    response.status(200).end();
-  });
-
+  bookshelf.transaction(function(t) {
+    return new Appointment(request.body)
+      .save(null, {transacting: t})
+      .catch(t.rollback);
+    })
+    .then(function(model) {
+      console.log(model.id);
+      response.json({ 'appointmentId': model.id });
+      response.status(200).end();
+    })
 });
 
 app.post('/updatePaidDate', function(request, response) {
-  var connection = getConnection();
-  connection.connect();
 
-  // JSON elements must match table column names
-  connection.query('UPDATE ' + APPOINTMENT_TABLE + ' SET paid = ? WHERE id = ?', [ request.body['paid'], request.body['id'] ], function (error, results, fields) {
-    if (error) throw error;
-    console.log(results.changedRows);
-    response.json({ 'rowsAffected': results.changedRows });
-    response.status(200).end();
-  });
+  bookshelf.transaction(function(t) {
+    return new Appointment({ id: request.body['id']})
+      .save({paid: request.body['paid']}, {patch: true}, {transacting: t})
+      .catch(t.rollback);
+    })
+    .then(function(model) {
+      // TODO Change to rowsAffected
+      // TODO Rollback if too many rows updated
+      response.json({ 'updatedAppointmentId': model.id });
+      response.status(200).end();
+    });
 });
 
 app.post('/saveClient', function(request, response) {
@@ -239,85 +233,27 @@ app.post('/saveClient', function(request, response) {
     request.body['firstcontact'] = null
   }
 
-  var connection = getConnection();
-  connection.connect();
-
-  if(!request.body.client_id) {
-    // JSON elements must match table column names
-    connection.beginTransaction(function(err) {
-      if (err) { throw err; }
-      connection.query('INSERT INTO clientele SET ?', request.body, function (error, result, fields) {
-        if (error) {
-          connection.rollback(function() {
-            throw err;
-          });
-        }
-
-        var clientId = result.insertId;
-        console.log('Client ID: ' + clientId);
-
-        var clientTopic = { 'client_id': clientId, 'topic_id': topicId }
-
-        connection.query('INSERT INTO clienttopic SET ?', clientTopic, function (error, results, fields) {
-          if (error) {
-            connection.rollback(function() {
-              throw err;
-            });
-          }
-          connection.commit(function(err) {
-            if (err) {
-              connection.rollback(function() {
-                throw err;
-              });
-            }
-            console.log('Transaction Complete.');
-            connection.end();
-            response.json({ 'clientId': clientId });
-            response.status(200).end();
-          });
-        });
-      });
-    });
-  } else {
-    connection.beginTransaction(function(err) {
-      var clientId = request.body.client_id;
-      delete request.body.client_id;
-      if (err) { throw err; }
-      var query = connection.query('UPDATE clientele SET ? WHERE id = ?', [request.body, +clientId], function (error, result, fields) {
-        console.log(query.sql);
-        if (error) {
-          connection.rollback(function() {
-            throw err;
-          });
-        }
-        if (result.affectedRows > 1) {
-          console.log("Too many rows updated");
-          connection.rollback(function() {
-            throw err;
-          });
-        }
-        connection.commit(function(err) {
-          if (err) {
-            connection.rollback(function() {
-              throw err;
-            });
-          }
-          console.log('Transaction Complete.');
-          connection.end();
-          response.json({ 'rowsAffected': result.affectedRows });
-          response.status(200).end();
-        });
-      });
-    });
-  }
-});
-
-function getConnection() {
-  return mysql.createConnection({
-    host     : 'localhost',
-    user     : 'john',
-    password : 'test',
-    database : 'clientbiz',
-    timezone: 'utc'
+  bookshelf.transaction(function(t) {
+    if(!request.body.id) {
+      console.log("INSERT")
+      return new Clientele(request.body)
+        .save(request.body, {transacting: t})
+        .tap(function(model) {
+          return new ClientTopic({ client_id: model.id , topic_id: topicId})
+            .save(null, {transacting: t})
+        })
+        .catch(t.rollback);
+    } else {
+      console.log("UPDATE")
+      return new Clientele({ id: request.body.client_id })
+      .save(request.body, {patch: true }, {transacting: t})
+      .catch(t.rollback);
+    }
+  })
+  .then(function(model) {
+    // TODO Change to rowsAffected
+    // TODO Rollback if too many rows updated
+    response.json({ 'updatedClientId': model.id });
+    response.status(200).end();
   });
-}
+});
