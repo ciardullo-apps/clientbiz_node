@@ -1,6 +1,9 @@
 // angular code runs on the browser
 var clientBizApp = angular.module('clientBizApp', []);
 
+var sortOrders =  [ 'asc', 'desc' ];
+var sortOrderIndex = 1;
+
 clientBizApp.config(function($routeProvider) {
   $routeProvider
     .when('/client', {
@@ -45,6 +48,21 @@ function clientListController($scope, $http) {
     })
     .error(function(data) {
     });
+
+  $scope.loadClients = function(sortColumn) {
+    var config = {
+        params: {
+          'sortColumn': sortColumn,
+          'sortOrder': sortOrders[(sortOrderIndex ^= 1)]
+        }
+      };
+    $http.get('/client', config)
+      .success(function(data) {
+            $scope.clients = data;
+      })
+      .error(function(data) {
+      });
+  }
 }
 
 function appointmentListController($scope, $http, $routeParams) {

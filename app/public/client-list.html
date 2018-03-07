@@ -16,14 +16,14 @@
   <table class="table table-sm">
     <thead>
       <tr>
-        <th>#</th>
-        <th>First</th>
-        <th>Last</th>
-        <th>Contact</th>
-        <th>Timezone</th>
-        <th>Solicited</th>
-        <th># Appointments</th>
-        <th>Last Appointment</th>
+        <th><a href ng-click="loadClients('id')">#</a></th>
+        <th><a href ng-click="loadClients('firstname')">First</a></th>
+        <th><a href ng-click="loadClients('lastname')">Last</a></th>
+        <th><a href ng-click="loadClients('contactname')">Contact</a></th>
+        <th><a href ng-click="loadClients('timezone')">Timezone</a></th>
+        <th><a href ng-click="loadClients('solicited')">Solicited</a></th>
+        <th><a href ng-click="loadClients('numappts')"># Appointments</a></th>
+        <th><a href ng-click="loadClients('lastapptdate')">Last Appointment</a></th>
       </tr>
     </thead>
     <tbody>
@@ -33,7 +33,7 @@
         <td>{{ customer.lastname }}</td>
         <td>{{ customer.contactname }}</td>
         <td>{{ customer.timezone }}</td>
-        <td>{{ !!+customer.solicited }}</td>
+        <td><input type="checkbox" ng-checked="!!+customer.solicited" disabled="true"</td>
         <td><a ng-href="#/appointments/{{ customer.id }}">{{ customer.numappts }}</a></td>
         <td>{{ customer.lastapptdate }}</td>
       </tr>

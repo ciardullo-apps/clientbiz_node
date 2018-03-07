@@ -56,9 +56,21 @@ var ClientTopic = bookshelf.Model.extend({
 
 // Routes
 app.get('/client', function(request, response) {
+  var sortColumn = request.query['sortColumn'];
+  var sortOrder = request.query['sortOrder'];
+
+  if (!sortColumn) {
+    sortColumn = 'lastapptdate';
+  }
+
+  if (!sortOrder) {
+    sortOrder = 'desc';
+  }
+
   var clients = new Array();
-  new ClientView().orderBy('lastapptyearmonth', 'DESC')
-  .orderBy('numappts', 'DESC')
+
+  new ClientView()
+  .orderBy(sortColumn, sortOrder)
   .fetchAll().then(function(rows) {
     rows.forEach(function (model) {
       clients.push ({
