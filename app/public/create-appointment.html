@@ -18,7 +18,7 @@
         <tr>
           <td style="align=right;">Client:</td>
           <td style="align:left;">
-            <select ng-model="formData.client_id" ng-options="client.id as client.firstname for client in clients">
+            <select ng-model="formData.client_id" ng-options="client.id as client.firstname+' '+client.lastname for client in clients">
             </select>
           </td>
         </tr>

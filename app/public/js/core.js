@@ -136,7 +136,7 @@ function createAppointmentController($scope, $http, $routeParams) {
     'starttime': nextHour.toJSON().slice(0,16),
     'duration': 60,
     'rate': 60,
-    'billingpct': 0.75
+    'billingpct': 0.80
   };
 
   $scope.saveAppointment = function() {
