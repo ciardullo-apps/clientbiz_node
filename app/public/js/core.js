@@ -143,10 +143,7 @@ function createAppointmentController($scope, $http, $routeParams) {
     $http({
         method: 'POST',
         url: '/saveAppointment',
-        data: $.param($scope.formData), // pass fields as strings
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded'
-        } // set the headers so angular passes fields as form data and not request payload
+        data: $scope.formData,
       })
       .success(function(data) {
         console.log(data);
@@ -175,21 +172,24 @@ function receivablesController($scope, $http, $routeParams) {
       $scope.paiddate =  nextHour.toJSON().slice(0,10);
     })
     .error(function(data) {
+      console.log(data);
     });
 
   $scope.getPaid = function(appointmentId) {
-    $scope.updateAppointmentData["id"] = appointmentId;
-    $scope.updateAppointmentData["paid"] = $scope.paiddate ;
+    $scope.formData = {
+      "id": appointmentId,
+      "paid":  $scope.paiddate
+    }
 
     $http({
         method: 'POST',
         url: '/updatePaidDate',
-        data: $.param($scope.updateAppointmentData),
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded'
-        }
+        data: $scope.formData,
       })
       .success(function(data) {
+        console.log(data)
+      })
+      .error(function(data) {
         console.log(data);
       });
   }
@@ -245,10 +245,7 @@ function editClientController($scope, $http, $routeParams) {
     $http({
         method: 'POST',
         url: '/saveClient',
-        data: $.param($scope.formData),
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded'
-        }
+        data: $scope.formData,
       })
       .success(function(data) {
         console.log(data);

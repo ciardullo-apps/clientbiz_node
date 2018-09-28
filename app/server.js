@@ -205,7 +205,6 @@ app.get('/receivables', function(request, response) {
 });
 
 app.post('/saveAppointment', function(request, response) {
-
   bookshelf.transaction(function(t) {
     return new Appointment(request.body)
       .save(null, {transacting: t})
@@ -219,7 +218,6 @@ app.post('/saveAppointment', function(request, response) {
 });
 
 app.post('/updatePaidDate', function(request, response) {
-
   bookshelf.transaction(function(t) {
     return new Appointment({ id: request.body['id']})
       .save({paid: request.body['paid']}, {patch: true}, {transacting: t})
@@ -247,7 +245,6 @@ app.post('/saveClient', function(request, response) {
 
   bookshelf.transaction(function(t) {
     if(!request.body.id) {
-      console.log("INSERT")
       return new Clientele(request.body)
         .save(request.body, {transacting: t})
         .tap(function(model) {
@@ -256,7 +253,6 @@ app.post('/saveClient', function(request, response) {
         })
         .catch(t.rollback);
     } else {
-      console.log("UPDATE")
       return new Clientele({ id: request.body.client_id })
       .save(request.body, {patch: true }, {transacting: t})
       .catch(t.rollback);
