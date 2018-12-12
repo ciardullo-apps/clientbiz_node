@@ -81,6 +81,7 @@ app.get('/client', function(request, response) {
         'timezone': model.get('timezone'),
         'solicited': model.get('solicited'),
         'numappts': model.get('numappts'),
+        'revenue': model.get('revenue'),
         'lastapptdate': (model.get('lastapptdate') ? model.get('lastapptdate').toJSON().slice(0,10) : "")
       });
     });

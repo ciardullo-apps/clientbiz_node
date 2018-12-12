@@ -42,7 +42,7 @@
           <td style="align:left;">{{ receivable.duration }}</td>
           <td style="align:left;">{{ receivable.rate }}</td>
           <td style="align:left;">{{ receivable.billingpct }}</td>
-          <td style="align:left;">$ {{ (receivable.rate * (receivable.duration / 60) * receivable.billingpct).toFixed(2) }}</td>
+          <td style="align:left;">{{ (receivable.rate * (receivable.duration / 60) * receivable.billingpct) | currency:"$ ":0 }}</td>
           <td style="align:left;"><a href ng-click="getPaid(receivable.appointment_id)">Mark Paid</a></td>
         </tr>
       </tbody>
