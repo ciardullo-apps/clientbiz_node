@@ -15,12 +15,13 @@
     <table id="appointmentDetailTable" class="table table-sm">
       <thead>
         <tr>
-          <th style="align=center;">Topic ID</th>
+          <th style="align=center;">Topic</th>
           <th style="align=center;">Start time</th>
           <th style="align=center;">Duration</th>
           <th style="align=center;">Hourly Rate</th>
           <th style="align=center;">Billing %</th>
           <th style="align=center;">Date paid</th>
+          <th style="align=center;">&nbsp;</th>
         </tr>
       </thead>
       <tbody>
@@ -34,6 +35,28 @@
           <td style="align:left;">{{ appointment.rate }}</td>
           <td style="align:left;">{{ appointment.billingpct }}</td>
           <td style="align:left;">{{ appointment.paid.slice(0,10) }}</td>
+          <td>&nbsp;<button ng-disabled="appointment.description === ''" type="button" class="btn btn-info btn-sm" data-toggle="modal" data-target="#descModal{{appointment.id}}">Description</button>
+              <!-- Modal -->
+              <div class="modal fade" id="descModal{{appointment.id}}" role="dialog">
+                  <div class="modal-dialog">
+
+                      <!-- Modal content-->
+                      <div class="modal-content">
+                          <div class="modal-header">
+                              <h4 class="modal-title">Appointment Summary</h4>
+                              <button type="button" class="close" data-dismiss="modal">&times;</button>
+                          </div>
+                          <div class="modal-body">
+                              <span>{{appointment.description}}</<span>
+                          </div>
+                          <div class="modal-footer">
+                              <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                          </div>
+                      </div>
+
+                  </div>
+              </div>
+          </td>
         </tr>
       </tbody>
     </table>

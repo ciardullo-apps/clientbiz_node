@@ -140,7 +140,8 @@ app.get('/appointments/:clientId', function(request, response) {
           'duration': model.get('duration'),
           'rate': model.get('rate'),
           'billingpct': model.get('billingpct'),
-          'paid': (model.get('paid') ? model.get('paid').toLocaleString("en-US", { timeZone: 'UTC' }) : '')
+          'paid': (model.get('paid') ? model.get('paid').toLocaleString("en-US", { timeZone: 'UTC' }) : ''),
+          'description': model.get('description')
         });
       });
       response.json(appointments);
@@ -193,7 +194,7 @@ app.get('/receivables', function(request, response) {
           'duration': model.duration,
           'rate': model.rate,
           'billingpct': model.billingpct,
-          'paid': (model.paid ? model.paid.toLocaleString("en-US", { timeZone: 'UTC' }) : ''),
+          'paid': (model.paid ? model.paid.toLocaleString("en-US", { timeZone: 'UTC' }) : '')
       })
     })
 
