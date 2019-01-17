@@ -219,6 +219,7 @@ function editClientController($scope, $http, $routeParams) {
           'id': data.clientId,
           'firstname': data.firstname,
           'lastname': data.lastname,
+          'topicId': ""+data.topicId,
           'contactname': data.contactname,
           'city': data.city,
           'state': data.state,
@@ -234,7 +235,7 @@ function editClientController($scope, $http, $routeParams) {
 
   } else {
     $scope.formData = {
-      'topic_id': 2,
+      'topicId': 2,
       'firstcontact': nextHour.toJSON().slice(0,16),
       'firstresponse': nextHour.toJSON().slice(0,16),
       'solicited': "1"

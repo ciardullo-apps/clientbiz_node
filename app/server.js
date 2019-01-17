@@ -97,29 +97,39 @@ app.get('/client', function(request, response) {
 app.get('/client/:clientId', function(request, response) {
   var clientId = request.params['clientId'];
 
-  var client = null;
+  var client = { };
 
-  new Clientele().where('id', clientId)
-  .fetch().then(function(model) {
-      client = {
-        'clientId': model.get('id'),
-        'firstname': model.get('firstname'),
-        'lastname': model.get('lastname'),
-        'contactname': model.get('contactname'),
-        'city': model.get('city'),
-        'state': model.get('state'),
-        'timezone': model.get('timezone'),
-        'firstcontact': (model.get('firstcontact') ? model.get('firstcontact').toJSON().slice(0,16) : ''),
-        'firstresponse': model.get('firstresponse').toJSON().slice(0,16),
-        'solicited': model.get('solicited')
-      }
-      response.json(client);
-      response.status(200).end();
-    // response.json(rows.serialize());
-  })
-  .catch(function(error) {
-    console.error(error);
-  });
+  new Appointment().where('client_id', clientId)
+    .orderBy('id', 'DESC')
+    .fetch()
+    .then(function (model) {
+      client.topicId = model.get('topic_id');
+      new Clientele().where('id', clientId)
+        .fetch()
+        .then(function(model) {
+            client.clientId =  model.get('id');
+            client.firstname = model.get('firstname');
+            client.lastname = model.get('lastname');
+            client.contactname = model.get('contactname');
+            client.city = model.get('city');
+            client.state = model.get('state');
+            client.timezone = model.get('timezone');
+            client.firstcontact = (model.get('firstcontact') ? model.get('firstcontact').toJSON().slice(0,16) : '');
+            client.firstresponse = model.get('firstresponse').toJSON().slice(0,16);
+            client.solicited = model.get('solicited');
+
+            response.json(client);
+            response.status(200).end();
+            // response.json(rows.serialize());
+      })
+      .catch(function(error) {
+        console.error(error);
+      });
+    })
+    .catch(function(error) {
+      console.error(error);
+    });
+
 });
 
 app.get('/appointments/:clientId', function(request, response) {
@@ -154,18 +164,15 @@ app.get('/appointments/:clientId', function(request, response) {
 });
 
 app.get('/topics', function(request, response) {
-  var topics = new Array();
+  var topics = { };
 
   new Topic().orderBy('id', 'ASC')
   .fetchAll().then(function(rows) {
     rows.forEach(function (model) {
-      topics.push ({
-        'id': model.get('id'),
-        'topicName': model.get('name')
-      });
+        topics[model.get('id')] = model.get('name');
     });
     var jsonMessage = {
-      'topics': topics
+      topics
     }
     response.json(jsonMessage);
     response.status(200).end();
