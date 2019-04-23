@@ -27,23 +27,30 @@
           <th style="align=center;">Paid</th>
         </tr>
       </thead>
-      <tbody>
+      <tbody ng-init="outstanding = 0">
         <tr>
           <td colspan="10" style="text-align:right">
             <input type="date" name="paiddate" ng-model="paiddate" />
           </td>
         </tr>
         <tr ng-repeat="receivable in receivables">
-          <td style="align:left;">{{ receivable.appointment_id }}</td>
-          <td style="align:left;">{{ receivable.firstname }}</td>
-          <td style="align:left;">{{ receivable.lastname }}</td>
-          <td style="align:left;">{{ receivable.topicname }}</td>
-          <td style="align:left;">{{ receivable.starttime }}</td>
-          <td style="align:left;">{{ receivable.duration }}</td>
-          <td style="align:left;">{{ receivable.rate }}</td>
-          <td style="align:left;">{{ receivable.billingpct }}</td>
-          <td style="align:left;">{{ (receivable.rate * (receivable.duration / 60) * receivable.billingpct) | currency:"$ ":0 }}</td>
-          <td style="align:left;"><a href ng-click="getPaid(receivable.appointment_id)">Mark Paid</a></td>
+          <td style="text-align:left;">{{ receivable.appointment_id }}</td>
+          <td style="text-align:left;">{{ receivable.firstname }}</td>
+          <td style="text-align:left;">{{ receivable.lastname }}</td>
+          <td style="text-align:left;">{{ receivable.topicname }}</td>
+          <td style="text-align:left;">{{ receivable.starttime }}</td>
+          <td style="text-align:left;">{{ receivable.duration }}</td>
+          <td style="text-align:left;">{{ receivable.rate }}</td>
+          <td style="text-align:left;">{{ receivable.billingpct }}</td>
+          <td style="text-align:right;">{{ (receivable.rate * (receivable.duration / 60) * receivable.billingpct) | currency:"$ ":0 }}</td>
+          <td style="text-align:left;" ng-init="$parent.outstanding = $parent.outstanding + (receivable.rate * (receivable.duration / 60) * receivable.billingpct)"><a href ng-click="getPaid(receivable.appointment_id)">Mark Paid</a></td>
+        </tr>
+        <tr>
+            <td colspan="8" style="text-align:right">&nbsp;</td>
+            <td style="text-align:right">
+                <b id="outstanding">$ {{ outstanding | number:2 }}</b>
+            </td>
+            <td style="text-align:right">&nbsp;</td>
         </tr>
       </tbody>
     </table>

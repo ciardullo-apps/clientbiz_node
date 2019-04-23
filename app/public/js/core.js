@@ -161,6 +161,7 @@ function createAppointmentController($scope, $http, $routeParams) {
 
 function receivablesController($scope, $http, $routeParams) {
   $scope.updateAppointmentData = {};
+  $scope.outstanding = 0.0;
 
   // Default to today
   var date = new Date();
