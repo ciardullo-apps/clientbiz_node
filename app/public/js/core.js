@@ -30,6 +30,10 @@ clientBizApp.config(function($routeProvider) {
       templateUrl: 'edit-client.html',
       controller: 'editClientController'
     })
+    .when('/reports/monthly-activity', {
+      templateUrl: 'monthly-activity.html',
+      controller: 'reportController'
+    })
 ;
 });
 
@@ -253,5 +257,31 @@ function editClientController($scope, $http, $routeParams) {
         console.log(data);
       });
 
+  }
+}
+
+function reportController($scope, $http) {
+  $scope.formData = {};
+
+  $http.get('/monthlyActivity')
+    .success(function(data) {
+          $scope.reportData = data;
+    })
+    .error(function(data) {
+    });
+
+  $scope.loadMonthlyActivity = function(sortColumn) {
+    var config = {
+        params: {
+          'sortColumn': sortColumn,
+          'sortOrder': sortOrders[(sortOrderIndex ^= 1)]
+        }
+      };
+    $http.get('/monthlyActivity', config)
+      .success(function(data) {
+            $scope.reportData = data;
+      })
+      .error(function(data) {
+      });
   }
 }

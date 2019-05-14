@@ -1,0 +1,38 @@
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-2 mb-3 border-bottom">
+  <h1 class="h2">Monthly Activity</h1>
+  <div class="btn-toolbar mb-2 mb-md-0">
+    <div class="btn-group mr-2">
+      <button class="btn btn-sm btn-outline-secondary">Share</button>
+      <button class="btn btn-sm btn-outline-secondary">Export</button>
+    </div>
+    <button class="btn btn-sm btn-outline-secondary dropdown-toggle">
+      <span data-feather="calendar"></span>
+      Recent
+    </button>
+  </div>
+</div>
+
+<div id="reportData" class="table-responsive">
+  <table class="table table-sm">
+    <thead>
+      <tr>
+        <th><a href ng-click="loadMonthlyActivity('monthOfYear')">Month / Year</a></th>
+        <th><a href ng-click="loadMonthlyActivity('totalClients')">Clients</a></th>
+        <th><a href ng-click="loadMonthlyActivity('totalAppointments')">Appointments</a></th>
+        <th><a href ng-click="loadMonthlyActivity('totalHours')">Hours</a></th>
+        <th><a href ng-click="loadMonthlyActivity('totalRevenue')">Revenue</a></th>
+        <th><a href ng-click="loadMonthlyActivity('averageRate')">Avg Rate</a></th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr ng-repeat="data in reportData">
+        <td>{{ data.monthOfYear }}</td>
+        <td>{{ data.totalClients }}</td>
+        <td>{{ data.totalAppointments }}</td>
+        <td>{{ data.totalHours | number:2 }}</td>
+        <td>{{ data.totalRevenue | currency:"$ ":0 }}</td>
+        <td>{{ data.averageRate | currency:"$ ":0 }}</td>
+      </tr>
+    </tbody>
+  </table>
+</div>

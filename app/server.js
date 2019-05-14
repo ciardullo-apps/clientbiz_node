@@ -1,6 +1,7 @@
 var express = require('express');
 var app = express();
 var bodyParser = require('body-parser');
+var knex = require('knex');
 app.use(express.static(__dirname + '/public'));
 
 app.use(bodyParser.urlencoded({
@@ -271,6 +272,39 @@ app.post('/saveClient', function(request, response) {
     // TODO Change to rowsAffected
     // TODO Rollback if too many rows updated
     response.json({ 'updatedClientId': model.id });
+    response.status(200).end();
+  });
+});
+
+// Routes
+app.get('/monthlyActivity', function(request, response) {
+  var sortColumn = request.query['sortColumn'];
+  var sortOrder = request.query['sortOrder'];
+
+  if (!sortColumn) {
+    sortColumn = 'monthOfYear';
+  }
+
+  if (!sortOrder) {
+    sortOrder = 'desc';
+  }
+
+  var reportData = new Array();
+
+  new Appointment()
+  .query()
+  .select(
+    bookshelf.knex.raw('DATE_FORMAT(starttime, \'%Y-%m-01\') as monthOfYear'),
+    bookshelf.knex.raw('SUM(duration / 60) as totalHours'),
+    bookshelf.knex.raw('SUM(rate * (duration / 60) * billingpct) as totalRevenue'),
+    bookshelf.knex.raw('SUM(rate * (duration / 60) * billingpct)/ sum(duration / 60) as averageRate')
+  )
+  .countDistinct('client_id as totalClients')
+  .count('id as totalAppointments')
+  .groupBy('monthOfYear')
+  .orderBy(sortColumn, sortOrder)
+  .tap(function(reportData) {
+    response.json(reportData);
     response.status(200).end();
   });
 });
