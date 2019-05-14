@@ -31,7 +31,7 @@ clientBizApp.config(function($routeProvider) {
       controller: 'editClientController'
     })
     .when('/reports/monthly-activity', {
-      templateUrl: 'monthly-activity.html',
+      templateUrl: 'reports/monthly-activity.html',
       controller: 'reportController'
     })
 ;
