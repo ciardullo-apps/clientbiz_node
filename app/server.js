@@ -308,3 +308,31 @@ app.get('/monthly-activity', function(request, response) {
     response.status(200).end();
   });
 });
+
+app.get('/activity-year-month/:year/:month', function(request, response) {
+  var sortColumn = request.query['sortColumn'];
+  var sortOrder = request.query['sortOrder'];
+
+  if (!sortColumn) {
+    sortColumn = 'appointment.id';
+  }
+
+  if (!sortOrder) {
+    sortOrder = 'desc';
+  }
+
+  var year = parseInt(request.params['year']);
+  var month = parseInt(request.params['month']);
+
+  new Appointment()
+  .query()
+  .select('appointment.*', 'clientele.firstname', 'clientele.lastname', 'topic.name as topicname')
+  .join('clientele', {'appointment.client_id': 'clientele.id'})
+  .join('topic', {'appointment.topic_id': 'topic.id'})
+  .whereRaw('YEAR(starttime) = ? and MONTH(starttime) = ?', [year, month])
+  .orderBy(sortColumn, sortOrder)
+  .tap(function(reportData) {
+    response.json(reportData);
+    response.status(200).end();
+  })
+});

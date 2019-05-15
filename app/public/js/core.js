@@ -255,28 +255,35 @@ app.controller("editClientController", function ($scope, $http, $routeParams) {
   }
 });
 
-function reportController($scope, $http) {
+app.controller("reportController", function ($scope, $http, $routeParams) {
   $scope.formData = {};
+  console.log($routeParams.name);
+  console.log($routeParams);
 
-  $http.get('/monthlyActivity')
-    .success(function(data) {
-          $scope.reportData = data;
-    })
-    .error(function(data) {
+  let endpoint = $routeParams.name;
+  if($routeParams.params) {
+    endpoint = endpoint + '/' + $routeParams.params;
+  }
+
+  $http.get('/' + endpoint)
+    .then(function successCallback(response) {
+      $scope.reportData = response.data;
+    }, function errorCallback(response) {
+      console.log(response.data);
     });
 
-  $scope.loadMonthlyActivity = function(sortColumn) {
+  $scope.loadReport = function(sortColumn) {
     var config = {
         params: {
           'sortColumn': sortColumn,
           'sortOrder': sortOrders[(sortOrderIndex ^= 1)]
         }
       };
-    $http.get('/monthlyActivity', config)
-      .success(function(data) {
-            $scope.reportData = data;
-      })
-      .error(function(data) {
+    $http.get(endpoint, config)
+      .then(function successCallback(response) {
+        $scope.reportData = response.data;
+      }, function errorCallback(response) {
+        console.log(response.data);
       });
   }
-}
+});

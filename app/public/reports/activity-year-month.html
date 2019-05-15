@@ -1,0 +1,53 @@
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-2 mb-3 border-bottom">
+  <h1 class="h2">Activity</h1>
+  <div class="btn-toolbar mb-2 mb-md-0">
+    <div class="btn-group mr-2">
+      <button class="btn btn-sm btn-outline-secondary">Share</button>
+      <button class="btn btn-sm btn-outline-secondary">Export</button>
+    </div>
+    <button class="btn btn-sm btn-outline-secondary dropdown-toggle">
+      <span data-feather="calendar"></span>
+      Recent
+    </button>
+  </div>
+</div>
+<div id="activityYearMonth" class="table-responsive">
+    <table id="activityYearMonthDetailTable" class="table table-sm">
+      <thead>
+        <tr>
+          <th style="align=center;"><a href ng-click="loadReport('appointment.id')">Appointment ID</a></th>
+          <th style="align=center;"><a href ng-click="loadReport('firstname')">Client First</a></th>
+          <th style="align=center;"><a href ng-click="loadReport('lastname')">Client Last</a></th>
+          <th style="align=center;"><a href ng-click="loadReport('topic.name')">Topic</a></th>
+          <th style="align=center;"><a href ng-click="loadReport('starttime')">Start time</a></th>
+          <th style="align=center;"><a href ng-click="loadReport('duration')">Duration</a></th>
+          <th style="align=center;"><a href ng-click="loadReport('rate')">Hourly Rate</a></th>
+          <th style="align=center;"><a href ng-click="loadReport('billingpct')">Billing %</a></th>
+          <th style="align=center;">Amount Due</th>
+          <th style="align=center;"><a href ng-click="loadReport('paid')">Paid</a></th>
+        </tr>
+      </thead>
+      <tbody ng-init="outstanding = 0">
+        <tr>
+            <td colspan="8" style="text-align:right">&nbsp;</td>
+            <td style="text-align:right">
+                <b id="outstanding">$ {{ outstanding | number:2 }}</b>
+            </td>
+            <td style="text-align:right">&nbsp;</td>
+        </tr>
+        <tr ng-repeat="data in reportData">
+          <td ng-init="$parent.outstanding = $parent.outstanding + (data.rate * (data.duration / 60) * data.billingpct)" style="text-align:left;">{{ data.id }}</td>
+          <td style="text-align:left;">{{ data.firstname }}</td>
+          <td style="text-align:left;">{{ data.lastname }}</td>
+          <td style="text-align:left;">{{ data.topicname }}</td>
+          <td style="text-align:left;">{{ data.starttime | date : 'short' : 'UTC' }}</td>
+          <td style="text-align:left;">{{ data.duration }}</td>
+          <td style="text-align:left;">{{ data.rate }}</td>
+          <td style="text-align:left;">{{ data.billingpct }}</td>
+          <td style="text-align:right;">{{ (data.rate * (data.duration / 60) * data.billingpct) | currency:"$ ":0 }}</td>
+          <td style="text-align:left;">{{ data.paid | date : 'shortDate' : 'UTC' }}</td>
+        </tr>
+      </tbody>
+    </table>
+
+</div>

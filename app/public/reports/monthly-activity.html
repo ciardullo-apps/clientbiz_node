@@ -16,17 +16,17 @@
   <table class="table table-sm">
     <thead>
       <tr>
-        <th><a href ng-click="loadMonthlyActivity('monthOfYear')">Month / Year</a></th>
-        <th><a href ng-click="loadMonthlyActivity('totalClients')">Clients</a></th>
-        <th><a href ng-click="loadMonthlyActivity('totalAppointments')">Appointments</a></th>
-        <th><a href ng-click="loadMonthlyActivity('totalHours')">Hours</a></th>
-        <th><a href ng-click="loadMonthlyActivity('totalRevenue')">Revenue</a></th>
-        <th><a href ng-click="loadMonthlyActivity('averageRate')">Avg Rate</a></th>
+        <th><a href ng-click="loadReport('monthOfYear')">Month / Year</a></th>
+        <th><a href ng-click="loadReport('totalClients')">Clients</a></th>
+        <th><a href ng-click="loadReport('totalAppointments')">Appointments</a></th>
+        <th><a href ng-click="loadReport('totalHours')">Hours</a></th>
+        <th><a href ng-click="loadReport('totalRevenue')">Revenue</a></th>
+        <th><a href ng-click="loadReport('averageRate')">Avg Rate</a></th>
       </tr>
     </thead>
     <tbody>
       <tr ng-repeat="data in reportData">
-        <td>{{ data.monthOfYear }}</td>
+        <td><a ng-href="#!/reports/activity-year-month/{{ data.monthOfYear.substr(0, 4) }}/{{ data.monthOfYear.substr(5, 7) }}">{{ data.monthOfYear }}</a></td>
         <td>{{ data.totalClients }}</td>
         <td>{{ data.totalAppointments }}</td>
         <td>{{ data.totalHours | number:2 }}</td>
