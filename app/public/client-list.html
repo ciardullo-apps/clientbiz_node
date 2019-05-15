@@ -30,12 +30,12 @@
     <tbody>
       <tr ng-repeat="customer in clients">
         <td>{{ customer.id}}</td>
-        <td><a ng-href="#/client/{{ customer.id }}">{{ customer.firstname }}</a></td>
+        <td><a ng-href="#!/client/{{ customer.id }}">{{ customer.firstname }}</a></td>
         <td>{{ customer.lastname }}</td>
         <td>{{ customer.contactname }}</td>
         <td>{{ customer.timezone }}</td>
         <td><input type="checkbox" ng-checked="!!+customer.solicited" disabled="true"></td>
-        <td><a ng-href="#/appointments/{{ customer.id }}">{{ customer.numappts }}</a></td>
+        <td><a ng-href="#!/appointments/{{ customer.id }}">{{ customer.numappts }}</a></td>
         <td>{{ customer.revenue | currency:"$ ":0 }}</td>
         <td>{{ customer.lastapptdate }}</td>
       </tr>

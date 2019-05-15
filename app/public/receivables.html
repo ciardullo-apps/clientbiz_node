@@ -38,11 +38,11 @@
           <td style="text-align:left;">{{ receivable.firstname }}</td>
           <td style="text-align:left;">{{ receivable.lastname }}</td>
           <td style="text-align:left;">{{ receivable.topicname }}</td>
-          <td style="text-align:left;">{{ receivable.starttime }}</td>
+          <td style="text-align:left;">{{ receivable.starttime | date : 'short' : 'UTC' }}</td>
           <td style="text-align:left;">{{ receivable.duration }}</td>
-          <td style="text-align:left;">{{ receivable.rate }}</td>
-          <td style="text-align:left;">{{ receivable.billingpct }}</td>
-          <td style="text-align:right;">{{ (receivable.rate * (receivable.duration / 60) * receivable.billingpct) | currency:"$ ":0 }}</td>
+          <td style="text-align:left;">{{ receivable.rate | number:2 }}</td>
+          <td style="text-align:left;">{{ receivable.billingpct | number:2 }}</td>
+          <td style="text-align:right;">{{ (receivable.rate * (receivable.duration / 60) * receivable.billingpct) | currency:"$ ":2 }}</td>
           <td style="text-align:left;" ng-init="$parent.outstanding = $parent.outstanding + (receivable.rate * (receivable.duration / 60) * receivable.billingpct)"><a href ng-click="getPaid(receivable.appointment_id)">Mark Paid</a></td>
         </tr>
         <tr>

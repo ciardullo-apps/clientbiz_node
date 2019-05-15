@@ -30,12 +30,12 @@
         </tr>
         <tr ng-repeat="appointment in appointments">
           <td style="align:left;">{{ topics[appointment.topic_id - 1].topicName }}</td>
-          <td style="align:left;">{{ appointment.starttime }}</td>
+          <td style="align:left;">{{ appointment.starttime | date : 'short' : 'UTC' }}</td>
           <td style="align:left;">{{ appointment.duration }}</td>
-          <td style="align:left;">{{ appointment.rate }}</td>
-          <td style="align:left;">{{ appointment.billingpct }}</td>
-          <td style="align:left;">{{ appointment.paid.slice(0,10) }}</td>
-          <td>&nbsp;<button ng-disabled="appointment.description === ''" type="button" class="btn btn-info btn-sm" data-toggle="modal" data-target="#descModal{{appointment.id}}">Description</button>
+          <td style="align:left;">{{ appointment.rate | number:2 }}</td>
+          <td style="align:left;">{{ appointment.billingpct | number:2  }}</td>
+          <td style="align:left;">{{ appointment.paid | date : 'shortDate' : 'UTC' }}</td>
+          <td>&nbsp;<button ng-disabled="!appointment.description" type="button" class="btn btn-info btn-sm" data-toggle="modal" data-target="#descModal{{appointment.id}}">Description</button>
               <!-- Modal -->
               <div class="modal fade" id="descModal{{appointment.id}}" role="dialog">
                   <div class="modal-dialog">

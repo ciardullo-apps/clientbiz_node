@@ -1,56 +1,66 @@
 // angular code runs on the browser
-var clientBizApp = angular.module('clientBizApp', []);
+// var clientBizApp = angular.module('clientBizApp', ['ngRoute','ngResource']);
+
+var app = angular.module('clientBizApp', ['ngRoute']);
+
+angular.module('clientBizApp').
+  config(['$routeProvider',
+    function config($routeProvider) {
+      $routeProvider
+      .when('/client', {
+        templateUrl: 'client-list.html',
+        controller: 'clientListController'
+      })
+      .when('/appointments/:clientId', {
+        templateUrl: 'appointment-list.html',
+        controller: 'appointmentListController'
+      })
+      .when('/addAppointment', {
+        templateUrl: 'create-appointment.html',
+        controller: 'createAppointmentController'
+      })
+      .when('/receivables', {
+        templateUrl: 'receivables.html',
+        controller: 'receivablesController'
+      })
+      .when('/client/:clientId', {
+        templateUrl: 'edit-client.html',
+        controller: 'editClientController'
+      })
+      .when('/addClient', {
+        templateUrl: 'edit-client.html',
+        controller: 'editClientController'
+      })
+      .when('/reports/:name/:params*?', {
+        templateUrl: function(templateBaseName) {
+          return 'reports/' + templateBaseName.name + '.html';
+        },
+        controller: 'reportController',
+      });
+    }
+  ]);
 
 var sortOrders =  [ 'asc', 'desc' ];
 var sortOrderIndex = 1;
 
-clientBizApp.config(function($routeProvider) {
-  $routeProvider
-    .when('/client', {
-      templateUrl: 'client-list.html',
-      controller: 'clientListController'
-    })
-    .when('/appointments/:clientId', {
-      templateUrl: 'appointment-list.html',
-      controller: 'appointmentListController'
-    })
-    .when('/addAppointment/:clientId', {
-      templateUrl: 'create-appointment.html',
-      controller: 'createAppointmentController'
-    })
-    .when('/receivables', {
-      templateUrl: 'receivables.html',
-      controller: 'receivablesController'
-    })
-    .when('/client/:clientId', {
-      templateUrl: 'edit-client.html',
-      controller: 'editClientController'
-    })
-    .when('/addClient', {
-      templateUrl: 'edit-client.html',
-      controller: 'editClientController'
-    })
-    .when('/reports/monthly-activity', {
-      templateUrl: 'reports/monthly-activity.html',
-      controller: 'reportController'
-    })
-;
-});
+// clientBizApp.config(function($routeProvider) {
+//   $routeProvider
+// });
 
-function clientListController($scope, $http) {
+app.controller("clientListController", function ($scope, $http) {
   $scope.formData = {};
   $http.get('/client')
-    .success(function(data) {
-          $scope.clients = data;
-    })
-    .error(function(data) {
+    .then(function successCallback(response) {
+      $scope.clients = response.data;
+    }, function errorCallback(response) {
+      console.log(response);
     });
 
   $http.get('/topics')
-    .success(function(data) {
-      $scope.topics = data.topics;
-    })
-    .error(function(data) {
+    .then(function successCallback(response) {
+      $scope.topics = response.data.topics;
+    }, function errorCallback(response) {
+      console.log(response);
     });
 
   $scope.loadClients = function(sortColumn) {
@@ -61,72 +71,66 @@ function clientListController($scope, $http) {
         }
       };
     $http.get('/client', config)
-      .success(function(data) {
-            $scope.clients = data;
-      })
-      .error(function(data) {
+      .then(function successCallback(response) {
+        $scope.clients = response.data;
+      }, function errorCallback(response) {
+        console.log(response);
       });
   }
-}
+});
 
-function appointmentListController($scope, $http, $routeParams) {
+app.controller("appointmentListController", function ($scope, $http, $routeParams) {
   var clientId = $routeParams['clientId'];
   $http.get('/appointments/' + clientId)
-    .success(function(data) {
-      $scope.appointments = data;
-    })
-    .error(function(data) {
+    .then(function successCallback(response) {
+      $scope.appointments = response.data;
+    }, function errorCallback(response) {
+      console.log(response);
     });
 
   $http.get('/topics')
-    .success(function(data) {
-      $scope.topics = data.topics;
-    })
-    .error(function(data) {
+    .then(function successCallback(response) {
+      $scope.topics = response.data.topics;
+    }, function errorCallback(response) {
+      console.log(response);
     });
 
   $http.get('/client/' + clientId)
-    .success(function(data) {
-      // alert(JSON.stringify(data));
-
+    .then(function successCallback(response) {
       $scope.client = {
-        'client_id': data.clientId,
-        'firstname': data.firstname,
-        'lastname': data.lastname,
-        'contactname': data.contactname,
-        'city': data.city,
-        'state': data.state,
-        'timezone': data.timezone,
-        'firstcontact': data.firstcontact,
-        'firstresponse': data.firstresponse,
-        'solicited': !!+data.solicited
+        'client_id': response.data.clientId,
+        'firstname': response.data.firstname,
+        'lastname': response.data.lastname,
+        'contactname': response.data.contactname,
+        'city': response.data.city,
+        'state': response.data.state,
+        'timezone': response.data.timezone,
+        'firstcontact': response.data.firstcontact,
+        'firstresponse': response.data.firstresponse,
+        'solicited': !!+response.data.solicited
       };
-
-    })
-    .error(function(data) {
+    }, function errorCallback(response) {
+      console.log(response);
     });
+});
 
-}
-
-function createAppointmentController($scope, $http, $routeParams) {
-  // var clientId = $routeParams['clientId'];
+app.controller("createAppointmentController", function ($scope, $http) {
   var clients = { };
   var topics = { };
 
   $http.get('/client')
-    .success(function(data) {
-      $scope.clients = data;
+    .then(function successCallback(response) {
+      $scope.clients = response.data;
 
       $http.get('/topics')
-        .success(function(data) {
-          $scope.topics = data.topics;
-        })
-        .error(function(data) {
-      });
-
-    })
-    .error(function(data) {
-  });
+        .then(function successCallback(response) {
+          $scope.topics = response.data;
+        }, function errorCallback(response) {
+          console.log(response);
+        });
+    }, function errorCallback(response) {
+      console.log(response);
+    });
 
   // Advance to next hour
   var date = new Date();
@@ -137,33 +141,29 @@ function createAppointmentController($scope, $http, $routeParams) {
   $scope.formData = {
     // 'client_id': 10,
     // 'topic_id': "2",
-    'starttime': nextHour.toJSON().slice(0,16),
+    'starttime': new Date(nextHour.toJSON().slice(0,16)),
     'duration': 60,
-    'rate': 60,
-    'billingpct': 0.80
+    'rate': 69,
+    'billingpct': 0.75
   };
 
   $scope.saveAppointment = function() {
+    // $scope.formData.starttime = $scope.formData.starttime.toJSON().slice(0,16);
+
     $http({
         method: 'POST',
         url: '/saveAppointment',
         data: $scope.formData,
       })
-      .success(function(data) {
-        console.log(data);
-        $http.get('/appointments/' + $scope.formData['client_id'])
-          .success(function(data) {
-            $scope.appointments = data;
-          })
-          .error(function(data) {
-          });
-
+      .then(function successCallback(response) {
+        console.log(response.data);
+      }, function errorCallback(response) {
+        console.log(response);
       });
+    };
+});
 
-  }
-}
-
-function receivablesController($scope, $http, $routeParams) {
+app.controller("receivablesController", function ($scope, $http, $routeParams) {
   $scope.updateAppointmentData = {};
   $scope.outstanding = 0.0;
 
@@ -172,18 +172,17 @@ function receivablesController($scope, $http, $routeParams) {
   var nextHour = new Date(date.getTime() - (date.getTimezoneOffset() * 60000));
 
   $http.get('/receivables')
-    .success(function(data) {
-      $scope.receivables = data;
-      $scope.paiddate =  nextHour.toJSON().slice(0,10);
-    })
-    .error(function(data) {
-      console.log(data);
+    .then(function successCallback(response) {
+      $scope.receivables = response.data;
+      $scope.paiddate =  nextHour;
+    }, function errorCallback(response) {
+      console.log(response);
     });
 
   $scope.getPaid = function(appointmentId) {
     $scope.formData = {
       "id": appointmentId,
-      "paid":  $scope.paiddate
+      "paid":  $scope.paiddate.toJSON().slice(0,10)
     }
 
     $http({
@@ -191,24 +190,22 @@ function receivablesController($scope, $http, $routeParams) {
         url: '/updatePaidDate',
         data: $scope.formData,
       })
-      .success(function(data) {
-        console.log(data)
-      })
-      .error(function(data) {
-        console.log(data);
+      .then(function successCallback(response) {
+        console.log(response.data)
+      }, function errorCallback(response) {
+        console.log(response.data);
       });
   }
-}
+});
 
-function editClientController($scope, $http, $routeParams) {
+app.controller("editClientController", function ($scope, $http, $routeParams) {
   var clientId = $routeParams['clientId'];
-  var topics = { };
   $http.get('/topics')
-    .success(function(data) {
-      $scope.topics = data.topics;
-    })
-    .error(function(data) {
-  });
+    .then(function successCallback(response) {
+      $scope.topics = response.data;
+    }, function errorCallback(response) {
+      console.log(response.data);
+    });
 
   // Advance to next hour
   var date = new Date();
@@ -218,32 +215,29 @@ function editClientController($scope, $http, $routeParams) {
 
   if (clientId) {
     $http.get('/client/' + clientId)
-      .success(function(data) {
-        // alert(JSON.stringify(data));
-        $scope.formData = {
-          'id': data.clientId,
-          'firstname': data.firstname,
-          'lastname': data.lastname,
-          'topicId': ""+data.topicId,
-          'contactname': data.contactname,
-          'city': data.city,
-          'state': data.state,
-          'timezone': data.timezone,
-          'firstcontact': data.firstcontact,
-          'firstresponse': data.firstresponse,
-          'solicited': !!+data.solicited
-        };
-
-      })
-      .error(function(data) {
-      });
-
+    .then(function successCallback(response) {
+      $scope.formData = {
+        'id': response.data.clientId,
+        'firstname': response.data.firstname,
+        'lastname': response.data.lastname,
+        'topic_id': ""+response.data.topicId,
+        'contactname': response.data.contactname,
+        'city': response.data.city,
+        'state': response.data.state,
+        'timezone': response.data.timezone,
+        'firstcontact': new Date(response.data.firstcontact),
+        'firstresponse': new Date(response.data.firstresponse),
+        'solicited': !!+response.data.solicited
+      };
+    }, function errorCallback(response) {
+      console.log(response.data);
+    });
   } else {
     $scope.formData = {
-      'topicId': 2,
-      'firstcontact': nextHour.toJSON().slice(0,16),
-      'firstresponse': nextHour.toJSON().slice(0,16),
-      'solicited': "1"
+      'topic_id': 2,
+      'firstcontact': new Date(nextHour.toJSON().slice(0,16)),
+      'firstresponse': new Date(nextHour.toJSON().slice(0,16)),
+      'solicited': true
     };
   }
 
@@ -253,12 +247,13 @@ function editClientController($scope, $http, $routeParams) {
         url: '/saveClient',
         data: $scope.formData,
       })
-      .success(function(data) {
-        console.log(data);
+      .then(function successCallback(response) {
+        console.log(response.data);
+      }, function errorCallback(response) {
+        console.log(response.data);
       });
-
   }
-}
+});
 
 function reportController($scope, $http) {
   $scope.formData = {};

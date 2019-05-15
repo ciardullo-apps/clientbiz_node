@@ -15,7 +15,9 @@
     <!-- Custom styles for this template -->
     <link href="css/clientbiz.css" rel="stylesheet">
 
-    <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.1.5/angular.min.js"></script><!-- load angular -->
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.7.8/angular.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.7.8/angular-resource.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.7.8/angular-route.min.js"></script>
     <script src="js/core.js"></script>
 
   </head>
@@ -37,31 +39,31 @@
           <div class="sidebar-sticky">
             <ul class="nav flex-column">
               <li class="nav-item">
-                <a class="nav-link active" ng-href="#/client">
+                <a class="nav-link active" ng-href="#!/client">
                   <span data-feather="users"></span>
                   Clients <span class="sr-only">(current)</span>
                 </a>
               </li>
               <li class="nav-item">
-                <a class="nav-link" ng-href="#/appointments/{{ client.id }}">
+                <a class="nav-link" ng-href="#!/appointments/{{ client.id }}">
                   <span data-feather="clock"></span>
                   Appointments
                 </a>
               </li>
               <li class="nav-item">
-                <a class="nav-link" ng-href="#/addClient">
+                <a class="nav-link" ng-href="#!/addClient">
                   <span data-feather="user-plus"></span>
                   New Client
                 </a>
               </li>
               <li class="nav-item">
-                <a class="nav-link" ng-href="#/addAppointment/{{ client.firstname }}">
+                <a class="nav-link" ng-href="#!/addAppointment/{{ client.firstname }}">
                   <span data-feather="plus-square"></span>
                   New Appointment
                 </a>
               </li>
               <li class="nav-item">
-                <a class="nav-link" ng-href="#/receivables">
+                <a class="nav-link" ng-href="#!/receivables">
                   <span data-feather="trending-up"></span>
                   Receive Payments
                 </a>
@@ -82,7 +84,7 @@
             </h6>
             <ul class="nav flex-column mb-2">
               <li class="nav-item">
-                <a class="nav-link" href="#/reports/monthly-activity">
+                <a class="nav-link" href="#!/reports/monthly-activity">
                   <span data-feather="file-text"></span>
                   Monthly Activity
                 </a>

@@ -100,37 +100,27 @@ app.get('/client/:clientId', function(request, response) {
 
   var client = { };
 
-  new Appointment().where('client_id', clientId)
-    .orderBy('id', 'DESC')
+  new Clientele().where('id', clientId)
     .fetch()
-    .then(function (model) {
-      client.topicId = model.get('topic_id');
-      new Clientele().where('id', clientId)
-        .fetch()
-        .then(function(model) {
-            client.clientId =  model.get('id');
-            client.firstname = model.get('firstname');
-            client.lastname = model.get('lastname');
-            client.contactname = model.get('contactname');
-            client.city = model.get('city');
-            client.state = model.get('state');
-            client.timezone = model.get('timezone');
-            client.firstcontact = (model.get('firstcontact') ? model.get('firstcontact').toJSON().slice(0,16) : '');
-            client.firstresponse = model.get('firstresponse').toJSON().slice(0,16);
-            client.solicited = model.get('solicited');
+    .then(function(model) {
+        client.clientId =  model.get('id');
+        client.firstname = model.get('firstname');
+        client.lastname = model.get('lastname');
+        client.contactname = model.get('contactname');
+        client.city = model.get('city');
+        client.state = model.get('state');
+        client.timezone = model.get('timezone');
+        client.firstcontact = (model.get('firstcontact') ? model.get('firstcontact').toJSON().slice(0,16) : '');
+        client.firstresponse = model.get('firstresponse').toJSON().slice(0,16);
+        client.solicited = model.get('solicited');
 
-            response.json(client);
-            response.status(200).end();
-            // response.json(rows.serialize());
-      })
-      .catch(function(error) {
-        console.error(error);
-      });
+        response.json(client);
+        response.status(200).end();
+        // response.json(rows.serialize());
     })
     .catch(function(error) {
       console.error(error);
     });
-
 });
 
 app.get('/appointments/:clientId', function(request, response) {
@@ -147,11 +137,11 @@ app.get('/appointments/:clientId', function(request, response) {
           'id': model.get('id'),
           'client_id': model.get('client_id'),
           'topic_id': model.get('topic_id'),
-          'starttime': model.get('starttime').toLocaleString("en-US", { timeZone: 'UTC' }),
+          'starttime': model.get('starttime'),
           'duration': model.get('duration'),
           'rate': model.get('rate'),
           'billingpct': model.get('billingpct'),
-          'paid': (model.get('paid') ? model.get('paid').toLocaleString("en-US", { timeZone: 'UTC' }) : ''),
+          'paid': model.get('paid'),
           'description': model.get('description')
         });
       });
@@ -165,17 +155,17 @@ app.get('/appointments/:clientId', function(request, response) {
 });
 
 app.get('/topics', function(request, response) {
-  var topics = { };
+  var topics = new Array();
 
   new Topic().orderBy('id', 'ASC')
   .fetchAll().then(function(rows) {
     rows.forEach(function (model) {
-        topics[model.get('id')] = model.get('name');
+        topics.push( {
+          'id': model.get('id'),
+          'name': model.get('name')
+        })
     });
-    var jsonMessage = {
-      topics
-    }
-    response.json(jsonMessage);
+    response.json(topics);
     response.status(200).end();
   })
   .catch(function(error) {
@@ -198,7 +188,7 @@ app.get('/receivables', function(request, response) {
           'firstname': model.client.firstname,
           'lastname': model.client.lastname,
           'topicname': model.topic.name,
-          'starttime': model.starttime.toLocaleString("en-US", { timeZone: 'UTC' }),
+          'starttime': model.starttime,
           'duration': model.duration,
           'rate': model.rate,
           'billingpct': model.billingpct,
@@ -215,6 +205,12 @@ app.get('/receivables', function(request, response) {
 });
 
 app.post('/saveAppointment', function(request, response) {
+  console.log(request.body);
+  let offset = new Date().getTimezoneOffset();
+  let apptDate = new Date(request.body.starttime);
+  apptDate.setMinutes(apptDate.getMinutes() - offset)
+  request.body.starttime = apptDate.toISOString().slice(0, 19).replace('T', ' ');
+
   bookshelf.transaction(function(t) {
     return new Appointment(request.body)
       .save(null, {transacting: t})
@@ -242,16 +238,23 @@ app.post('/updatePaidDate', function(request, response) {
 });
 
 app.post('/saveClient', function(request, response) {
-  console.log(request.body);
   var topicId = request.body.topic_id;
   delete request.body.topic_id;
 
-  if (request.body.solicited == 'true') {
-    request.body['solicited'] = true;
-  } else {
-    request.body['solicited'] = false;
-    request.body['firstcontact'] = null
+  let offset = new Date().getTimezoneOffset();
+  let firstContact = new Date(request.body.firstcontact);
+  firstContact.setMinutes(firstContact.getMinutes() - offset)
+  request.body.firstcontact = firstContact.toISOString().slice(0, 19).replace('T', ' ');
+
+  let firstResponse = new Date(request.body.firstresponse);
+  firstResponse.setMinutes(firstResponse.getMinutes() - offset)
+  request.body.firstresponse = firstResponse.toISOString().slice(0, 19).replace('T', ' ');
+
+  if (request.body.solicited === false) {
+    request.body['firstcontact'] = null;
   }
+
+  console.log(request.body);
 
   bookshelf.transaction(function(t) {
     if(!request.body.id) {
@@ -276,8 +279,7 @@ app.post('/saveClient', function(request, response) {
   });
 });
 
-// Routes
-app.get('/monthlyActivity', function(request, response) {
+app.get('/monthly-activity', function(request, response) {
   var sortColumn = request.query['sortColumn'];
   var sortOrder = request.query['sortOrder'];
 
@@ -289,12 +291,10 @@ app.get('/monthlyActivity', function(request, response) {
     sortOrder = 'desc';
   }
 
-  var reportData = new Array();
-
   new Appointment()
   .query()
   .select(
-    bookshelf.knex.raw('DATE_FORMAT(starttime, \'%Y-%m-01\') as monthOfYear'),
+    bookshelf.knex.raw('DATE_FORMAT(starttime, \'%Y-%m\') as monthOfYear'),
     bookshelf.knex.raw('SUM(duration / 60) as totalHours'),
     bookshelf.knex.raw('SUM(rate * (duration / 60) * billingpct) as totalRevenue'),
     bookshelf.knex.raw('SUM(rate * (duration / 60) * billingpct)/ sum(duration / 60) as averageRate')

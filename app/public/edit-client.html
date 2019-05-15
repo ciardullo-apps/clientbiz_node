@@ -26,7 +26,7 @@
         <tr>
           <td style="align=right;">Topic:</td>
           <td style="align:left;">
-            <select ng-model="formData.topicId" ng-options="value for (key, value) in topics" >
+            <select ng-model="formData.topic_id" ng-options="topic.id as topic.name for topic in topics" >
             </select>
           </td>
         </tr>
