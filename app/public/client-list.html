@@ -36,7 +36,7 @@
         <td>{{ customer.timezone }}</td>
         <td><input type="checkbox" ng-checked="!!+customer.solicited" disabled="true"></td>
         <td><a ng-href="#!/appointments/{{ customer.id }}">{{ customer.numappts }}</a></td>
-        <td>{{ customer.revenue | currency:"$ ":0 }}</td>
+        <td>{{ customer.revenue | currency:"$ " : 2 }}</td>
         <td>{{ customer.lastapptdate }}</td>
       </tr>
     </tbody>
