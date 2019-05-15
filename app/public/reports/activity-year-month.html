@@ -44,7 +44,7 @@
           <td style="text-align:left;">{{ data.duration }}</td>
           <td style="text-align:left;">{{ data.rate }}</td>
           <td style="text-align:left;">{{ data.billingpct }}</td>
-          <td style="text-align:right;">{{ (data.rate * (data.duration / 60) * data.billingpct) | currency:"$ ":0 }}</td>
+          <td style="text-align:right;">{{ (data.rate * (data.duration / 60) * data.billingpct) | currency:"$ " : 2 }}</td>
           <td style="text-align:left;">{{ data.paid | date : 'shortDate' : 'UTC' }}</td>
         </tr>
       </tbody>
