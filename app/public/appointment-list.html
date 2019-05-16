@@ -29,7 +29,7 @@
           <td colspan="6">&nbsp;</td>
         </tr>
         <tr ng-repeat="appointment in appointments">
-          <td style="align:left;">{{ topics[appointment.topic_id - 1].topicName }}</td>
+          <td style="align:left;">{{ appointment.topic_name }}</td>
           <td style="align:left;">{{ appointment.starttime | date : 'short' : 'UTC' }}</td>
           <td style="align:left;">{{ appointment.duration }}</td>
           <td style="align:left;">{{ appointment.rate | number:2 }}</td>

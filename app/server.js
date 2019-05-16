@@ -131,12 +131,15 @@ app.get('/appointments/:clientId', function(request, response) {
   new Appointment()
     .where('client_id', clientId)
     .orderBy('starttime', 'ASC')
-    .fetchAll().then(function(rows) {
+    .fetchAll({withRelated: ['client', 'topic']})
+    .then(function(rows) {
       rows.forEach(function (model) {
+        var topicInfo = model.related('topic');
         appointments.push ({
           'id': model.get('id'),
           'client_id': model.get('client_id'),
           'topic_id': model.get('topic_id'),
+          'topic_name': topicInfo.get('name'),
           'starttime': model.get('starttime'),
           'duration': model.get('duration'),
           'rate': model.get('rate'),
