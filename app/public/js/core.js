@@ -1,7 +1,7 @@
 // angular code runs on the browser
 // var clientBizApp = angular.module('clientBizApp', ['ngRoute','ngResource']);
 
-var app = angular.module('clientBizApp', ['ngRoute']);
+var app = angular.module('clientBizApp', ['ngRoute', 'chart.js']);
 
 angular.module('clientBizApp').
   config(['$routeProvider',
@@ -36,6 +36,10 @@ angular.module('clientBizApp').
           return 'reports/' + templateBaseName.name + '.html';
         },
         controller: 'reportController',
+      })
+      .when('/graph/:name', {
+        templateUrl: 'graph.html',
+        controller: 'graphController'
       });
     }
   ]);
@@ -286,4 +290,43 @@ app.controller("reportController", function ($scope, $http, $routeParams) {
         console.log(response.data);
       });
   }
+});
+
+app.controller("graphController", function ($scope, $http, $routeParams) {
+  $scope.formData = {};
+  console.log($routeParams.name);
+  console.log($routeParams);
+
+  let endpoint = $routeParams.name;
+  if($routeParams.params) {
+    endpoint = endpoint + '/' + $routeParams.params;
+  }
+
+  $scope.labels = [];
+  $scope.data = [];
+  $http.get('/' + endpoint)
+    .then(function successCallback(response) {
+      console.log(response.data);
+      response.data.forEach(function (rowData) {
+        $scope.labels.push(rowData.name);
+        $scope.data.push(rowData.pctOfTotal);
+      });
+      $scope.options = {
+        legend: {
+            display: true,
+            position: 'left',
+            labels: {
+                fontColor: 'rgb(255, 99, 132)'
+            },
+            // onClick: function(event, legendItem) {
+            //   var index = legendItem.datasetIndex;
+            //   var ci = this.chart;
+            //   var meta = ci.getDatasetMeta(0);
+            //   console.log(meta);
+            // }
+        }
+      };
+    }, function errorCallback(response) {
+      console.log(response.data);
+    });
 });
