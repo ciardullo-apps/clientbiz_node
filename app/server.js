@@ -340,16 +340,34 @@ app.get('/activity-year-month/:year/:month', function(request, response) {
   })
 });
 
-app.get('/revenue-by-topic', function(request, response) {
+app.get('/revenue-by-topic/:year?', function(request, response) {
+  var year = parseInt(request.params['year']);
+  console.log(year);
   new Appointment()
   .query()
   .select(
     'name',
-  //  bookshelf.knex.raw('SUM(rate * (duration / 60) * billingpct) as totalRevenue'),
-  bookshelf.knex.raw('sum(rate * (duration / 60) * billingpct) as totalRevenue, convert(sum(rate * (duration / 60) * billingpct) / sum(sum(rate * (duration / 60) * billingpct)) over () * 100, decimal(9,2)) as pctOfTotal')
+    //  bookshelf.knex.raw('SUM(rate * (duration / 60) * billingpct) as totalRevenue'),
+    bookshelf.knex.raw('sum(rate * (duration / 60) * billingpct) as totalRevenue, convert(sum(rate * (duration / 60) * billingpct) / sum(sum(rate * (duration / 60) * billingpct)) over () * 100, decimal(9,2)) as pctOfTotal')
   )
   .join('topic', {'appointment.topic_id': 'topic.id'})
+  .modify(function(qb) {
+    if(year) {
+      qb.whereRaw('YEAR(starttime) = ?', [year]);
+    }
+  })
   .groupBy('name')
+  .tap(function(reportData) {
+    response.json(reportData);
+    response.status(200).end();
+  })
+});
+
+app.get('/revenue-years', function(request, response) {
+  new Appointment()
+  .query()
+  .select(bookshelf.knex.raw('distinct year(starttime) as revenueYear'))
+  .orderBy('revenueYear')
   .tap(function(reportData) {
     response.json(reportData);
     response.status(200).end();

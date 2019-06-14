@@ -302,6 +302,14 @@ app.controller("graphController", function ($scope, $http, $routeParams) {
     endpoint = endpoint + '/' + $routeParams.params;
   }
 
+  $http.get('/revenue-years')
+    .then(function successCallback(response) {
+      console.log(response.data);
+      $scope.revenueYears = [{ 'revenueYear': 'All' }].concat(response.data);
+    }, function errorCallback(response) {
+      console.log(response);
+    });
+
   $scope.labels = [];
   $scope.data = [];
   $http.get('/' + endpoint)
@@ -329,4 +337,34 @@ app.controller("graphController", function ($scope, $http, $routeParams) {
     }, function errorCallback(response) {
       console.log(response.data);
     });
+
+    $scope.loadRevenueByTopicYear = function(revenueYear) {
+      $scope.labels = [];
+      $scope.data = [];
+
+      $http.get('/revenue-by-topic/' + revenueYear)
+        .then(function successCallback(response) {
+          response.data.forEach(function (rowData) {
+            $scope.labels.push(rowData.name);
+            $scope.data.push(rowData.pctOfTotal);
+          });
+          $scope.options = {
+            legend: {
+                display: true,
+                position: 'left',
+                labels: {
+                    fontColor: 'rgb(255, 99, 132)'
+                },
+                // onClick: function(event, legendItem) {
+                //   var index = legendItem.datasetIndex;
+                //   var ci = this.chart;
+                //   var meta = ci.getDatasetMeta(0);
+                //   console.log(meta);
+                // }
+            }
+          };
+        }, function errorCallback(response) {
+          console.log(response.data);
+        });
+    }
 });

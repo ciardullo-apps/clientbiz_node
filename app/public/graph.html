@@ -11,6 +11,12 @@
     </button>
   </div>
 </div>
+<div class="btn-group btn-group-toggle" data-toggle="buttons">
+  <a ng-repeat="revenueYear in revenueYears" ng-click="loadRevenueByTopicYear(revenueYear.revenueYear)"
+    class="btn btn-primary ml-2">
+    <span ng-bind="revenueYear.revenueYear"></span>
+  </a>
+</div>
 <div style='width:800px;height:500px'>
   <canvas
     class="chart chart-pie"
