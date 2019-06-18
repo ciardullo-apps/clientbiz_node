@@ -30,8 +30,8 @@
         <td>{{ data.totalClients }}</td>
         <td>{{ data.totalAppointments }}</td>
         <td>{{ data.totalHours | number:2 }}</td>
-        <td>{{ data.totalRevenue | currency:"$ ":0 }}</td>
-        <td>{{ data.averageRate | currency:"$ ":0 }}</td>
+        <td>{{ data.totalRevenue | currency:"$ ":2 }}</td>
+        <td>{{ data.averageRate | currency:"$ ":2 }}</td>
       </tr>
     </tbody>
   </table>
