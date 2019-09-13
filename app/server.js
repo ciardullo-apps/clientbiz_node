@@ -1,17 +1,34 @@
 var express = require('express');
 var app = express();
+var fs = require('fs');
+var https = require('https');
 var bodyParser = require('body-parser');
 var knex = require('knex');
 app.use(express.static(__dirname + '/public'));
+
 
 app.use(bodyParser.urlencoded({
     extended: true
 }));
 app.use(bodyParser.json());
 
-app.listen(8080);
+// Read certs and private key from filesystem
+var key = fs.readFileSync('/opt/certs/spiaggia.key');
+var cert = fs.readFileSync( '/opt/certs/spiaggia.crt' );
+var ca = fs.readFileSync( '/opt/certs/spiaggiaCA.crt' );
 
-console.log('Application listening on port 8080');
+var options = {
+  key: key,
+  cert: cert,
+  ca: ca
+};
+
+var port = 8081;
+https.createServer(options, app).listen(port);
+
+// app.listen(port); // Unencrypted connections
+
+console.log('Application listening on port ' + port);
 
 var bookshelf = require('./bookshelf');
 
