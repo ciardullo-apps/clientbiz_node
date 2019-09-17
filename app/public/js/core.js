@@ -53,14 +53,14 @@ var sortOrderIndex = 1;
 
 app.controller("clientListController", function ($scope, $http) {
   $scope.formData = {};
-  $http.get('/client')
+  $http.get('client')
     .then(function successCallback(response) {
       $scope.clients = response.data;
     }, function errorCallback(response) {
       console.log(response);
     });
 
-  $http.get('/topics')
+  $http.get('topics')
     .then(function successCallback(response) {
       $scope.topics = response.data.topics;
     }, function errorCallback(response) {
@@ -74,7 +74,7 @@ app.controller("clientListController", function ($scope, $http) {
           'sortOrder': sortOrders[(sortOrderIndex ^= 1)]
         }
       };
-    $http.get('/client', config)
+    $http.get('client', config)
       .then(function successCallback(response) {
         $scope.clients = response.data;
       }, function errorCallback(response) {
@@ -85,21 +85,21 @@ app.controller("clientListController", function ($scope, $http) {
 
 app.controller("appointmentListController", function ($scope, $http, $routeParams) {
   var clientId = $routeParams['clientId'];
-  $http.get('/appointments/' + clientId)
+  $http.get('appointments/' + clientId)
     .then(function successCallback(response) {
       $scope.appointments = response.data;
     }, function errorCallback(response) {
       console.log(response);
     });
 
-  $http.get('/topics')
+  $http.get('topics')
     .then(function successCallback(response) {
       $scope.topics = response.data.topics;
     }, function errorCallback(response) {
       console.log(response);
     });
 
-  $http.get('/client/' + clientId)
+  $http.get('client/' + clientId)
     .then(function successCallback(response) {
       $scope.client = {
         'client_id': response.data.clientId,
@@ -122,11 +122,11 @@ app.controller("createAppointmentController", function ($scope, $http) {
   var clients = { };
   var topics = { };
 
-  $http.get('/client')
+  $http.get('client')
     .then(function successCallback(response) {
       $scope.clients = response.data;
 
-      $http.get('/topics')
+      $http.get('topics')
         .then(function successCallback(response) {
           $scope.topics = response.data;
         }, function errorCallback(response) {
@@ -156,7 +156,7 @@ app.controller("createAppointmentController", function ($scope, $http) {
 
     $http({
         method: 'POST',
-        url: '/saveAppointment',
+        url: 'saveAppointment',
         data: $scope.formData,
       })
       .then(function successCallback(response) {
@@ -175,7 +175,7 @@ app.controller("receivablesController", function ($scope, $http, $routeParams) {
   var date = new Date();
   var nextHour = new Date(date.getTime() - (date.getTimezoneOffset() * 60000));
 
-  $http.get('/receivables')
+  $http.get('receivables')
     .then(function successCallback(response) {
       $scope.receivables = response.data;
       $scope.paiddate =  nextHour;
@@ -191,7 +191,7 @@ app.controller("receivablesController", function ($scope, $http, $routeParams) {
 
     $http({
         method: 'POST',
-        url: '/updatePaidDate',
+        url: 'updatePaidDate',
         data: $scope.formData,
       })
       .then(function successCallback(response) {
@@ -204,7 +204,7 @@ app.controller("receivablesController", function ($scope, $http, $routeParams) {
 
 app.controller("editClientController", function ($scope, $http, $routeParams) {
   var clientId = $routeParams['clientId'];
-  $http.get('/topics')
+  $http.get('topics')
     .then(function successCallback(response) {
       $scope.topics = response.data;
     }, function errorCallback(response) {
@@ -218,7 +218,7 @@ app.controller("editClientController", function ($scope, $http, $routeParams) {
   nextHour.setHours(nextHour.getHours() + 1);
 
   if (clientId) {
-    $http.get('/client/' + clientId)
+    $http.get('client/' + clientId)
     .then(function successCallback(response) {
       $scope.formData = {
         'id': response.data.clientId,
@@ -248,7 +248,7 @@ app.controller("editClientController", function ($scope, $http, $routeParams) {
   $scope.saveClient = function() {
     $http({
         method: 'POST',
-        url: '/saveClient',
+        url: 'saveClient',
         data: $scope.formData,
       })
       .then(function successCallback(response) {
@@ -269,7 +269,7 @@ app.controller("reportController", function ($scope, $http, $routeParams) {
     endpoint = endpoint + '/' + $routeParams.params;
   }
 
-  $http.get('/' + endpoint)
+  $http.get(endpoint)
     .then(function successCallback(response) {
       $scope.reportData = response.data;
     }, function errorCallback(response) {
@@ -302,7 +302,7 @@ app.controller("graphController", function ($scope, $http, $routeParams) {
     endpoint = endpoint + '/' + $routeParams.params;
   }
 
-  $http.get('/revenue-years')
+  $http.get('revenue-years')
     .then(function successCallback(response) {
       console.log(response.data);
       $scope.revenueYears = [{ 'revenueYear': 'ALL' }].concat(response.data);
@@ -312,7 +312,7 @@ app.controller("graphController", function ($scope, $http, $routeParams) {
 
   $scope.labels = [];
   $scope.data = [];
-  $http.get('/' + endpoint)
+  $http.get(endpoint)
     .then(function successCallback(response) {
       console.log(response.data);
       response.data.forEach(function (rowData) {
@@ -336,7 +336,7 @@ app.controller("graphController", function ($scope, $http, $routeParams) {
       $scope.labels = [];
       $scope.data = [];
 
-      $http.get('/revenue-by-topic/' + revenueYear)
+      $http.get('revenue-by-topic/' + revenueYear)
         .then(function successCallback(response) {
           response.data.forEach(function (rowData) {
             $scope.labels.push(rowData.name);

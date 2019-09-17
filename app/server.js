@@ -1,35 +1,10 @@
 var express = require('express');
 var app = express();
+var clientBizRouter = express.Router();
 var fs = require('fs');
 var https = require('https');
 var bodyParser = require('body-parser');
 var knex = require('knex');
-app.use(express.static(__dirname + '/public'));
-
-
-app.use(bodyParser.urlencoded({
-    extended: true
-}));
-app.use(bodyParser.json());
-
-// Read certs and private key from filesystem
-var key = fs.readFileSync('/opt/certs/spiaggia.key');
-var cert = fs.readFileSync( '/opt/certs/spiaggia.crt' );
-var ca = fs.readFileSync( '/opt/certs/spiaggiaCA.crt' );
-
-var options = {
-  key: key,
-  cert: cert,
-  ca: ca
-};
-
-var port = 8081;
-https.createServer(options, app).listen(port);
-
-// app.listen(port); // Unencrypted connections
-
-console.log('Application listening on port ' + port);
-
 var bookshelf = require('./bookshelf');
 
 // Relations
@@ -73,7 +48,7 @@ var ClientTopic = bookshelf.Model.extend({
 
 
 // Routes
-app.get('/client', function(request, response) {
+clientBizRouter.get('/client', function(request, response) {
   var sortColumn = request.query['sortColumn'];
   var sortOrder = request.query['sortOrder'];
 
@@ -112,7 +87,7 @@ app.get('/client', function(request, response) {
   });
 });
 
-app.get('/client/:clientId', function(request, response) {
+clientBizRouter.get('/client/:clientId', function(request, response) {
   var clientId = request.params['clientId'];
 
   var client = { };
@@ -140,7 +115,7 @@ app.get('/client/:clientId', function(request, response) {
     });
 });
 
-app.get('/appointments/:clientId', function(request, response) {
+clientBizRouter.get('/appointments/:clientId', function(request, response) {
   let clientId = request.params['clientId'];
 
   var appointments = new Array();
@@ -174,7 +149,7 @@ app.get('/appointments/:clientId', function(request, response) {
 
 });
 
-app.get('/topics', function(request, response) {
+clientBizRouter.get('/topics', function(request, response) {
   var topics = new Array();
 
   new Topic().orderBy('id', 'ASC')
@@ -193,7 +168,7 @@ app.get('/topics', function(request, response) {
   });
 });
 
-app.get('/receivables', function(request, response) {
+clientBizRouter.get('/receivables', function(request, response) {
   let clientId = request.params['clientId'];
 
   var receivables = new Array();
@@ -299,7 +274,7 @@ app.post('/saveClient', function(request, response) {
   });
 });
 
-app.get('/monthly-activity', function(request, response) {
+clientBizRouter.get('/monthly-activity', function(request, response) {
   var sortColumn = request.query['sortColumn'];
   var sortOrder = request.query['sortOrder'];
 
@@ -329,7 +304,7 @@ app.get('/monthly-activity', function(request, response) {
   });
 });
 
-app.get('/activity-year-month/:year/:month', function(request, response) {
+clientBizRouter.get('/activity-year-month/:year/:month', function(request, response) {
   var sortColumn = request.query['sortColumn'];
   var sortOrder = request.query['sortOrder'];
 
@@ -357,7 +332,7 @@ app.get('/activity-year-month/:year/:month', function(request, response) {
   })
 });
 
-app.get('/revenue-by-topic/:year?', function(request, response) {
+clientBizRouter.get('/revenue-by-topic/:year?', function(request, response) {
   var year = parseInt(request.params['year']);
   console.log(year);
   new Appointment()
@@ -380,7 +355,7 @@ app.get('/revenue-by-topic/:year?', function(request, response) {
   })
 });
 
-app.get('/revenue-years', function(request, response) {
+clientBizRouter.get('/revenue-years', function(request, response) {
   new Appointment()
   .query()
   .select(bookshelf.knex.raw('distinct year(starttime) as revenueYear'))
@@ -390,3 +365,32 @@ app.get('/revenue-years', function(request, response) {
     response.status(200).end();
   })
 });
+
+app.use('/clientbiz-node', express.static(__dirname + '/public'));
+
+app.use(bodyParser.urlencoded({
+    extended: true
+}));
+app.use(bodyParser.json());
+
+/* Use unencrypted connections from nginx
+// Read certs and private key from filesystem
+var key = fs.readFileSync('/opt/certs/spiaggia.key');
+var cert = fs.readFileSync( '/opt/certs/spiaggia.crt' );
+var ca = fs.readFileSync( '/opt/certs/spiaggiaCA.crt' );
+
+var options = {
+  key: key,
+  cert: cert,
+  ca: ca
+};
+
+var port = 8081;
+https.createServer(options, app).listen(port);
+*/
+
+app.use('/clientbiz-node', clientBizRouter);
+var port = 8080;
+app.listen(port); // Unencrypted connections
+
+console.log('Application listening on port ' + port);
