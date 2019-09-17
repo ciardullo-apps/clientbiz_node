@@ -199,7 +199,7 @@ clientBizRouter.get('/receivables', function(request, response) {
     });
 });
 
-app.post('/saveAppointment', function(request, response) {
+clientBizRouter.post('/saveAppointment', function(request, response) {
   console.log(request.body);
   let offset = new Date().getTimezoneOffset();
   let apptDate = new Date(request.body.starttime);
@@ -218,7 +218,7 @@ app.post('/saveAppointment', function(request, response) {
     })
 });
 
-app.post('/updatePaidDate', function(request, response) {
+clientBizRouter.post('/updatePaidDate', function(request, response) {
   bookshelf.transaction(function(t) {
     return new Appointment({ id: request.body['id']})
       .save({paid: request.body['paid']}, {patch: true}, {transacting: t})
@@ -232,7 +232,7 @@ app.post('/updatePaidDate', function(request, response) {
     });
 });
 
-app.post('/saveClient', function(request, response) {
+clientBizRouter.post('/saveClient', function(request, response) {
   var topicId = request.body.topic_id;
   delete request.body.topic_id;
 
