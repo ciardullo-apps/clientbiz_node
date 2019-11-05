@@ -6,6 +6,27 @@ var https = require('https');
 var bodyParser = require('body-parser');
 var knex = require('knex');
 var bookshelf = require('./bookshelf');
+const cors = require('cors');
+const config = require('./config');
+console.log(config);
+
+// Allow only requests from this server's frontend
+const corsOptions = {
+  origin: `${config.protocol}://${config.hostName}:${config.clientPort}`,
+  allowedHeaders: 'Origin, X-Requested-With, Content-Type, Accept, Authorization',
+  methods: 'GET, PUT, POST, OPTIONS',
+  credentials: true,
+  optionsSuccessStatus: 200
+}
+app.use(cors(corsOptions));
+
+// app.use((req, res, next) => {
+// 	res.setHeader('Access-Control-Allow-Origin', `${dotenv.protocol}://${dotenv.hostName}:${dotenv.clientPort}`);
+// 	res.setHeader('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
+// 	res.setHeader('Access-Control-Allow-Methods', 'GET, PUT, POST, OPTIONS');
+// 	res.setHeader('Access-Control-Allow-Credentials', 'true');
+// 	next();
+// });
 
 // Relations
 var Topic = bookshelf.Model.extend({
