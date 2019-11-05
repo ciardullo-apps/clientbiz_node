@@ -394,11 +394,11 @@ app.use(bodyParser.urlencoded({
 }));
 app.use(bodyParser.json());
 
-/* Use unencrypted connections from nginx
+// Use unencrypted connections from nginx
 // Read certs and private key from filesystem
-var key = fs.readFileSync('/opt/certs/spiaggia.key');
-var cert = fs.readFileSync( '/opt/certs/spiaggia.crt' );
-var ca = fs.readFileSync( '/opt/certs/spiaggiaCA.crt' );
+var key = fs.readFileSync(config.tlsKeyPath);
+var cert = fs.readFileSync( config.tlsCertPath);
+var ca = fs.readFileSync(config.tlsCertAuthPath);
 
 var options = {
   key: key,
@@ -406,12 +406,15 @@ var options = {
   ca: ca
 };
 
-var port = 8081;
+app.use('/clientbiz-node', clientBizRouter);
+var port = 3001;
 https.createServer(options, app).listen(port);
-*/
 
+
+/*
 app.use('/clientbiz-node', clientBizRouter);
 var port = 8080;
 app.listen(port); // Unencrypted connections
+*/
 
 console.log('Application listening on port ' + port);
