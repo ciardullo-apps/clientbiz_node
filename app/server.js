@@ -407,14 +407,14 @@ var options = {
 };
 
 app.use('/clientbiz-node', clientBizRouter);
-var port = 3001;
-https.createServer(options, app).listen(port);
+// var port = 3001;
+https.createServer(options, app).listen(config.serverPort);
 
 
 /*
 app.use('/clientbiz-node', clientBizRouter);
-var port = 8080;
+var port = 3001;
 app.listen(port); // Unencrypted connections
 */
 
-console.log('Application listening on port ' + port);
+console.log('Application listening on port ' + config.serverPort);
