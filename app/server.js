@@ -9,6 +9,7 @@ var bookshelf = require('./bookshelf');
 const cors = require('cors');
 const config = require('./config');
 console.log(config);
+var auth = require('./auth');
 
 // Allow only requests from this server's frontend
 const corsOptions = {
@@ -407,6 +408,7 @@ var options = {
 };
 
 app.use('/clientbiz-node', clientBizRouter);
+app.use('/clientbiz-node/auth', auth);
 // var port = 3001;
 https.createServer(options, app).listen(config.serverPort);
 

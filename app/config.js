@@ -10,5 +10,7 @@ module.exports = {
   jwtKey: process.env.JWT_KEY,
   tlsKeyPath: process.env.TLS_KEY_PATH,
   tlsCertPath: process.env.TLS_CERT_PATH,
-  tlsCertAuthPath: process.env.TLS_CERT_AUTH_PATH
+  tlsCertAuthPath: process.env.TLS_CERT_AUTH_PATH,
+  userId: process.env.USER_ID,
+  userEmail: process.env.USER_EMAIL  
 };
