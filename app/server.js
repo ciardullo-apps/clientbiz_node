@@ -7,9 +7,15 @@ var bodyParser = require('body-parser');
 var knex = require('knex');
 var bookshelf = require('./bookshelf');
 const cors = require('cors');
+
 const config = require('./config');
 console.log(config);
-var auth = require('./auth');
+
+var passport = require('passport');
+var passportStrategy = require('./passport-strategy')(passport);
+app.use(passport.initialize());
+app.use(passport.session());
+var auth = require('./auth')(passport);
 
 // Allow only requests from this server's frontend
 const corsOptions = {
