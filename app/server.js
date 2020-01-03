@@ -265,17 +265,17 @@ clientBizRouter.post('/saveClient', function(request, response) {
   delete request.body.topic_id;
 
   let offset = new Date().getTimezoneOffset();
-  let firstContact = new Date(request.body.firstcontact);
-  firstContact.setMinutes(firstContact.getMinutes() - offset)
-  request.body.firstcontact = firstContact.toISOString().slice(0, 19).replace('T', ' ');
+  if (request.body.solicited === false) {
+    request.body['firstcontact'] = null;
+  } else {
+    let firstContact = new Date(request.body.firstcontact);
+    firstContact.setMinutes(firstContact.getMinutes() - offset)
+    request.body.firstcontact = firstContact.toISOString().slice(0, 19).replace('T', ' ');
+  }
 
   let firstResponse = new Date(request.body.firstresponse);
   firstResponse.setMinutes(firstResponse.getMinutes() - offset)
   request.body.firstresponse = firstResponse.toISOString().slice(0, 19).replace('T', ' ');
-
-  if (request.body.solicited === false) {
-    request.body['firstcontact'] = null;
-  }
 
   console.log(request.body);
 
