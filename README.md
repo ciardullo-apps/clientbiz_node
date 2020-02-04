@@ -17,3 +17,4 @@ HTML 5 input field DATETIME format requires that the datetime value _is set_ in 
 When setting the INPUT form field to the appropriate DATETIME value, use Date.toJSON().slice(0,16)
 
 When displaying a datetime without an INPUT form control of type DATETIME, use .toLocaleString("en-US", { timeZone: 'UTC' });
+
