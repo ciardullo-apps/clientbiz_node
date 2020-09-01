@@ -12,5 +12,10 @@ module.exports = {
   tlsCertPath: process.env.TLS_CERT_PATH,
   tlsCertAuthPath: process.env.TLS_CERT_AUTH_PATH,
   userId: process.env.USER_ID,
-  userEmail: process.env.USER_EMAIL  
+  userEmail: process.env.USER_EMAIL,
+  dbHost: process.env.DB_HOST,
+  dbTlsCertAuthPath: process.env.DB_TLS_CERT_AUTH_PATH,
+  dbSchema: process.env.DB_SCHEMA,
+  dbUser: process.env.DB_USER,
+  dbPass: process.env.DB_PASS
 };
