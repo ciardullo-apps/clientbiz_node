@@ -224,7 +224,6 @@ app.controller("editClientController", function ($scope, $http, $routeParams) {
         'id': response.data.clientId,
         'firstname': response.data.firstname,
         'lastname': response.data.lastname,
-        'topic_id': ""+response.data.topicId,
         'contactname': response.data.contactname,
         'city': response.data.city,
         'state': response.data.state,
@@ -236,9 +235,14 @@ app.controller("editClientController", function ($scope, $http, $routeParams) {
     }, function errorCallback(response) {
       console.log(response.data);
     });
+    $http.get('topics/' + clientId)
+    .then(function successCallback(response) {
+      $scope.formData.assigned_topics = response.data;
+    }, function errorCallback(response) {
+      console.log(response.data);
+    });
   } else {
     $scope.formData = {
-      'topic_id': 2,
       'firstcontact': new Date(nextHour.toJSON().slice(0,16)),
       'firstresponse': new Date(nextHour.toJSON().slice(0,16)),
       'solicited': true

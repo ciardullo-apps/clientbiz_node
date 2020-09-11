@@ -6,6 +6,8 @@ var https = require('https');
 var bodyParser = require('body-parser');
 var knex = require('knex');
 var bookshelf = require('./bookshelf');
+var Promise = require('bluebird')
+
 const cors = require('cors');
 
 const config = require('./config');
@@ -71,7 +73,10 @@ var Appointment = bookshelf.Model.extend({
 });
 
 var ClientTopic = bookshelf.Model.extend({
-  tableName: 'clienttopic'
+  tableName: 'clienttopic',
+  topic: function() {
+    return this.hasOne(Topic, 'id', 'topic_id');
+  }
 });
 
 
@@ -120,7 +125,8 @@ clientBizRouter.get('/client/:clientId', function(request, response) {
 
   var client = { };
 
-  new Clientele().where('id', clientId)
+  new Clientele()
+    .where('id', clientId)
     .fetch()
     .then(function(model) {
         client.clientId =  model.get('id');
@@ -196,6 +202,31 @@ clientBizRouter.get('/topics', function(request, response) {
   });
 });
 
+clientBizRouter.get('/topics/:clientId', function(request, response) {
+  var clientId = request.params['clientId'];
+
+  var topics = new Array();
+
+  new ClientTopic()
+  .where('client_id', clientId)
+  .fetchAll({withRelated: ['topic']})
+  .then(function(rows) {
+    rows.toJSON().forEach(function (model) {
+      topics.push(model.topic_id)
+      // topics.push ({
+      //   'topic_id': model.topic_id,
+      //   'topic_name': model.topic.name
+      // })
+    })
+    response.json(topics);
+    response.status(200).end();
+    // response.json(rows.serialize());
+  })
+  .catch(function(error) {
+    console.error(error);
+  });
+});
+
 clientBizRouter.get('/receivables', function(request, response) {
   let clientId = request.params['clientId'];
 
@@ -261,8 +292,8 @@ clientBizRouter.post('/updatePaidDate', function(request, response) {
 });
 
 clientBizRouter.post('/saveClient', function(request, response) {
-  var topicId = request.body.topic_id;
-  delete request.body.topic_id;
+  var assignedTopics = request.body.assigned_topics;
+  delete request.body.assigned_topics; // Not part of the Clientele relation
 
   let offset = new Date().getTimezoneOffset();
   if (request.body.solicited === false) {
@@ -279,19 +310,34 @@ clientBizRouter.post('/saveClient', function(request, response) {
 
   console.log(request.body);
 
+  let insertTopics = new Array();
+  assignedTopics.forEach((topicId) => {
+    insertTopics.push({
+      topic_id: topicId
+    })
+  });
+
   bookshelf.transaction(function(t) {
     if(!request.body.id) {
       return new Clientele(request.body)
-        .save(request.body, {transacting: t})
+        .save(null, {transacting: t})
         .tap(function(model) {
-          return new ClientTopic({ client_id: model.id , topic_id: topicId})
-            .save(null, {transacting: t})
+          return Promise.map(insertTopics, function(info) {
+            return new ClientTopic(info)
+              .save({'client_id': model.id}, {transacting: t})
+          })
         })
         .catch(t.rollback);
     } else {
-      return new Clientele({ id: request.body.client_id })
-      .save(request.body, {patch: true }, {transacting: t})
-      .catch(t.rollback);
+      return new Clientele(request.body.id)
+        .save(request.body, {patch: true, transacting: t})
+        .tap(function(model) {
+          return Promise.map(insertTopics, function(info) {
+            return new ClientTopic(info)
+              .save({'client_id': model.id}, {transacting: t})
+          })
+        })
+        .catch(t.rollback);
     }
   })
   .then(function(model) {
