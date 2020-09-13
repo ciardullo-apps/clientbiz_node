@@ -318,45 +318,37 @@ clientBizRouter.post('/saveClient', function(request, response) {
   });
 
   bookshelf.transaction(function(t) {
+    let clientele;
+    let payload = null;
+    let options = {transacting: t}
     if(!request.body.id) {
-      return new Clientele(request.body)
-        .save(null, {transacting: t})
-        .tap(function(model) {
-          return Promise.map(insertTopics, function(info) {
-            return new ClientTopic(info)
-              .save({'client_id': model.id}, {transacting: t})
-          })
-        })
-        .catch(function(err) {
-          t.rollback(err);
-        })
-        .then((model) => {
-          response.json({ 'updatedClientId': model.id });
-          response.status(200).end();
-        });
+      clientele = new Clientele(request.body)
     } else {
-      return new Clientele(request.body.id)
-        .save(request.body, {patch: true, transacting: t})
-        .tap(function(model) {
-          return Promise.map(insertTopics, function(info) {
-            return new ClientTopic(info)
-              .save({'client_id': model.id}, {transacting: t})
-              .catch(function(err) {
-                console.error(err.sqlMessage); // OK if topic was previously assigned
-                // t.rollback(err);
-              });
-          })
-        })
-        .catch(function(err) {
-          t.rollback(err);
-        })
-        .then((model) => {
-          // TODO Change to rowsAffected
-          // TODO Rollback if too many rows updated
-          response.json({ 'updatedClientId': model.id });
-          response.status(200).end();
-        });
+      clientele = new Clientele(request.body.id)
+      payload = request.body
+      options.patch = true;
     }
+    return clientele
+      .save(payload, options)
+      .tap(function(model) {
+        return Promise.map(insertTopics, function(info) {
+          return new ClientTopic(info)
+            .save({'client_id': model.id}, {transacting: t})
+            .catch(function(err) {
+              console.warn(err.sqlMessage); // OK if topic was previously assigned
+            });
+        })
+      })
+      .catch(function(err) {
+        console.log(err);
+        t.rollback(err);
+      })
+      .then((model) => {
+        // TODO Change to rowsAffected
+        // TODO Rollback if too many rows updated
+        response.json({ 'updatedClientId': model.id });
+        response.status(200).end();
+      });
   })
 });
 
