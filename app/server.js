@@ -327,7 +327,9 @@ clientBizRouter.post('/saveClient', function(request, response) {
               .save({'client_id': model.id}, {transacting: t})
           })
         })
-        .catch(t.rollback);
+        .catch(function(err) {
+          t.rollback(err);
+        });
     } else {
       return new Clientele(request.body.id)
         .save(request.body, {patch: true, transacting: t})
@@ -335,15 +337,21 @@ clientBizRouter.post('/saveClient', function(request, response) {
           return Promise.map(insertTopics, function(info) {
             return new ClientTopic(info)
               .save({'client_id': model.id}, {transacting: t})
+              .catch(function(err) {
+                console.error(err.sqlMessage); // OK if topic was previously assigned
+                // t.rollback(err);
+              });
           })
         })
-        .catch(t.rollback);
+        .catch(function(err) {
+          t.rollback(err);
+        });
     }
   })
-  .then(function(model) {
+  .then(() => {
     // TODO Change to rowsAffected
     // TODO Rollback if too many rows updated
-    response.json({ 'updatedClientId': model.id });
+    response.json({ 'updatedClientId': request.body.id });
     response.status(200).end();
   });
 });
