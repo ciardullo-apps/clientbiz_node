@@ -329,6 +329,10 @@ clientBizRouter.post('/saveClient', function(request, response) {
         })
         .catch(function(err) {
           t.rollback(err);
+        })
+        .then((model) => {
+          response.json({ 'updatedClientId': model.id });
+          response.status(200).end();
         });
     } else {
       return new Clientele(request.body.id)
@@ -345,15 +349,15 @@ clientBizRouter.post('/saveClient', function(request, response) {
         })
         .catch(function(err) {
           t.rollback(err);
+        })
+        .then((model) => {
+          // TODO Change to rowsAffected
+          // TODO Rollback if too many rows updated
+          response.json({ 'updatedClientId': model.id });
+          response.status(200).end();
         });
     }
   })
-  .then(() => {
-    // TODO Change to rowsAffected
-    // TODO Rollback if too many rows updated
-    response.json({ 'updatedClientId': request.body.id });
-    response.status(200).end();
-  });
 });
 
 clientBizRouter.get('/monthly-activity', function(request, response) {
