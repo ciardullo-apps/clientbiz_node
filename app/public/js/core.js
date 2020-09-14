@@ -221,7 +221,7 @@ app.controller("editClientController", function ($scope, $http, $routeParams) {
     $http.get('client/' + clientId)
     .then(function successCallback(response) {
       $scope.formData = {
-        'id': response.data.clientId,
+        'id': response.data.id,
         'firstname': response.data.firstname,
         'lastname': response.data.lastname,
         'contactname': response.data.contactname,
@@ -257,6 +257,7 @@ app.controller("editClientController", function ($scope, $http, $routeParams) {
       })
       .then(function successCallback(response) {
         console.log(response.data);
+        $scope.formData.id = response.data.updatedClientId;
       }, function errorCallback(response) {
         console.log(response.data);
       });

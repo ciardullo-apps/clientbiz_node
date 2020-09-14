@@ -129,7 +129,7 @@ clientBizRouter.get('/client/:clientId', function(request, response) {
     .where('id', clientId)
     .fetch()
     .then(function(model) {
-        client.clientId =  model.get('id');
+        client.id =  model.get('id');
         client.firstname = model.get('firstname');
         client.lastname = model.get('lastname');
         client.contactname = model.get('contactname');
