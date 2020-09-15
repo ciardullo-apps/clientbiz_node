@@ -296,7 +296,7 @@ clientBizRouter.post('/saveClient', function(request, response) {
   delete request.body.assigned_topics; // Not part of the Clientele relation
 
   let offset = new Date().getTimezoneOffset();
-  if (request.body.solicited === false) {
+  if (request.body.solicited === 0) {
     request.body['firstcontact'] = null;
   } else {
     let firstContact = new Date(request.body.firstcontact);
