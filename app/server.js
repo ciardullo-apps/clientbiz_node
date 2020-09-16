@@ -12,6 +12,9 @@ const cors = require('cors');
 
 const config = require('./config');
 console.log(config);
+console.log('Are you getting 401 Unauthorized?', `Change your passport strategy, currently ${config.passportStrategy}`)
+// Use 'local' passport strategy for NodeJS/AngularJS
+// Use 'jwt' for Angular2
 
 var passport = require('passport');
 var passportStrategy = require('./passport-strategy')(passport);
@@ -81,7 +84,7 @@ var ClientTopic = bookshelf.Model.extend({
 
 
 // Routes
-clientBizRouter.get('/client', function(request, response) {
+clientBizRouter.get('/client', passport.authenticate(config.passportStrategy, { session: false }), function(request, response) {
   var sortColumn = request.query['sortColumn'];
   var sortOrder = request.query['sortOrder'];
 
@@ -120,7 +123,7 @@ clientBizRouter.get('/client', function(request, response) {
   });
 });
 
-clientBizRouter.get('/client/:clientId', function(request, response) {
+clientBizRouter.get('/client/:clientId', passport.authenticate(config.passportStrategy, { session: false }), function(request, response) {
   var clientId = request.params['clientId'];
 
   var client = { };
@@ -149,7 +152,7 @@ clientBizRouter.get('/client/:clientId', function(request, response) {
     });
 });
 
-clientBizRouter.get('/appointments/:clientId', function(request, response) {
+clientBizRouter.get('/appointments/:clientId', passport.authenticate(config.passportStrategy, { session: false }), function(request, response) {
   let clientId = request.params['clientId'];
 
   var appointments = new Array();
@@ -202,7 +205,7 @@ clientBizRouter.get('/topics', function(request, response) {
   });
 });
 
-clientBizRouter.get('/topics/:clientId', function(request, response) {
+clientBizRouter.get('/topics/:clientId', passport.authenticate(config.passportStrategy, { session: false }), function(request, response) {
   var clientId = request.params['clientId'];
 
   var topics = new Array();
@@ -227,7 +230,7 @@ clientBizRouter.get('/topics/:clientId', function(request, response) {
   });
 });
 
-clientBizRouter.get('/receivables', function(request, response) {
+clientBizRouter.get('/receivables', passport.authenticate(config.passportStrategy, { session: false }), function(request, response) {
   let clientId = request.params['clientId'];
 
   var receivables = new Array();
@@ -258,8 +261,10 @@ clientBizRouter.get('/receivables', function(request, response) {
     });
 });
 
-clientBizRouter.post('/saveAppointment', function(request, response) {
+clientBizRouter.post('/saveAppointment', passport.authenticate(config.passportStrategy, { session: false }), function(request, response) {
   console.log(request.body);
+  delete request.body.username
+  delete request.body.password
   let offset = new Date().getTimezoneOffset();
   let apptDate = new Date(request.body.starttime);
   apptDate.setMinutes(apptDate.getMinutes() - offset)
@@ -277,7 +282,10 @@ clientBizRouter.post('/saveAppointment', function(request, response) {
     })
 });
 
-clientBizRouter.post('/updatePaidDate', function(request, response) {
+clientBizRouter.post('/updatePaidDate', passport.authenticate(config.passportStrategy, { session: false }), function(request, response) {
+  console.log(request.body);
+  delete request.body.username
+  delete request.body.password
   bookshelf.transaction(function(t) {
     return new Appointment({ id: request.body['id']})
       .save({paid: request.body['paid']}, {patch: true}, {transacting: t})
@@ -291,9 +299,11 @@ clientBizRouter.post('/updatePaidDate', function(request, response) {
     });
 });
 
-clientBizRouter.post('/saveClient', function(request, response) {
+clientBizRouter.post('/saveClient', passport.authenticate(config.passportStrategy, { session: false }), function(request, response) {
   var assignedTopics = request.body.assigned_topics;
   delete request.body.assigned_topics; // Not part of the Clientele relation
+  delete request.body.username
+  delete request.body.password
 
   let offset = new Date().getTimezoneOffset();
   if (request.body.solicited === 0) {
@@ -352,7 +362,7 @@ clientBizRouter.post('/saveClient', function(request, response) {
   })
 });
 
-clientBizRouter.get('/monthly-activity', function(request, response) {
+clientBizRouter.get('/monthly-activity', passport.authenticate(config.passportStrategy, { session: false }), function(request, response) {
   var sortColumn = request.query['sortColumn'];
   var sortOrder = request.query['sortOrder'];
 
@@ -382,7 +392,7 @@ clientBizRouter.get('/monthly-activity', function(request, response) {
   });
 });
 
-clientBizRouter.get('/activity-year-month/:year/:month', function(request, response) {
+clientBizRouter.get('/activity-year-month/:year/:month', passport.authenticate(config.passportStrategy, { session: false }), function(request, response) {
   var sortColumn = request.query['sortColumn'];
   var sortOrder = request.query['sortOrder'];
 
@@ -410,7 +420,7 @@ clientBizRouter.get('/activity-year-month/:year/:month', function(request, respo
   })
 });
 
-clientBizRouter.get('/revenue-by-topic/:year?', function(request, response) {
+clientBizRouter.get('/revenue-by-topic/:year?', passport.authenticate(config.passportStrategy, { session: false }), function(request, response) {
   var year = parseInt(request.params['year']);
   console.log(year);
   new Appointment()
@@ -433,7 +443,7 @@ clientBizRouter.get('/revenue-by-topic/:year?', function(request, response) {
   })
 });
 
-clientBizRouter.get('/revenue-years', function(request, response) {
+clientBizRouter.get('/revenue-years', passport.authenticate(config.passportStrategy, { session: false }), function(request, response) {
   new Appointment()
   .query()
   .select(bookshelf.knex.raw('distinct year(starttime) as revenueYear'))

@@ -2,6 +2,13 @@
 // var clientBizApp = angular.module('clientBizApp', ['ngRoute','ngResource']);
 
 var app = angular.module('clientBizApp', ['ngRoute', 'chart.js']);
+// Needed by Passport local strategy in the request
+let localCredentials = {
+  params: {
+    username: 'a',
+    password: 'a'
+  }
+};
 
 angular.module('clientBizApp').
   config(['$routeProvider',
@@ -53,7 +60,7 @@ var sortOrderIndex = 1;
 
 app.controller("clientListController", function ($scope, $http) {
   $scope.formData = {};
-  $http.get('client')
+  $http.get('client', localCredentials)
     .then(function successCallback(response) {
       $scope.clients = response.data;
     }, function errorCallback(response) {
@@ -69,10 +76,12 @@ app.controller("clientListController", function ($scope, $http) {
 
   $scope.loadClients = function(sortColumn) {
     var config = {
-        params: {
+        params: Object.assign({},
+        {
           'sortColumn': sortColumn,
           'sortOrder': sortOrders[(sortOrderIndex ^= 1)]
-        }
+        },
+        localCredentials.params)
       };
     $http.get('client', config)
       .then(function successCallback(response) {
@@ -85,7 +94,7 @@ app.controller("clientListController", function ($scope, $http) {
 
 app.controller("appointmentListController", function ($scope, $http, $routeParams) {
   var clientId = $routeParams['clientId'];
-  $http.get('appointments/' + clientId)
+  $http.get('appointments/' + clientId, localCredentials)
     .then(function successCallback(response) {
       $scope.appointments = response.data;
     }, function errorCallback(response) {
@@ -99,7 +108,7 @@ app.controller("appointmentListController", function ($scope, $http, $routeParam
       console.log(response);
     });
 
-  $http.get('client/' + clientId)
+  $http.get('client/' + clientId, localCredentials)
     .then(function successCallback(response) {
       $scope.client = {
         'client_id': response.data.clientId,
@@ -122,7 +131,7 @@ app.controller("createAppointmentController", function ($scope, $http) {
   var clients = { };
   var topics = { };
 
-  $http.get('client')
+  $http.get('client', localCredentials)
     .then(function successCallback(response) {
       $scope.clients = response.data;
 
@@ -157,7 +166,7 @@ app.controller("createAppointmentController", function ($scope, $http) {
     $http({
         method: 'POST',
         url: 'saveAppointment',
-        data: $scope.formData,
+        data: Object.assign({}, $scope.formData, localCredentials.params)
       })
       .then(function successCallback(response) {
         console.log(response.data);
@@ -175,7 +184,7 @@ app.controller("receivablesController", function ($scope, $http, $routeParams) {
   var date = new Date();
   var nextHour = new Date(date.getTime() - (date.getTimezoneOffset() * 60000));
 
-  $http.get('receivables')
+  $http.get('receivables', localCredentials)
     .then(function successCallback(response) {
       $scope.receivables = response.data;
       $scope.paiddate =  nextHour;
@@ -192,7 +201,7 @@ app.controller("receivablesController", function ($scope, $http, $routeParams) {
     $http({
         method: 'POST',
         url: 'updatePaidDate',
-        data: $scope.formData,
+        data: Object.assign({}, $scope.formData, localCredentials.params)
       })
       .then(function successCallback(response) {
         console.log(response.data)
@@ -218,7 +227,7 @@ app.controller("editClientController", function ($scope, $http, $routeParams) {
   nextHour.setHours(nextHour.getHours() + 1);
 
   if (clientId) {
-    $http.get('client/' + clientId)
+    $http.get('client/' + clientId, localCredentials)
     .then(function successCallback(response) {
       $scope.formData = {
         'id': response.data.id,
@@ -235,7 +244,7 @@ app.controller("editClientController", function ($scope, $http, $routeParams) {
     }, function errorCallback(response) {
       console.log(response.data);
     });
-    $http.get('topics/' + clientId)
+    $http.get('topics/' + clientId, localCredentials)
     .then(function successCallback(response) {
       $scope.formData.assigned_topics = response.data;
     }, function errorCallback(response) {
@@ -253,7 +262,7 @@ app.controller("editClientController", function ($scope, $http, $routeParams) {
     $http({
         method: 'POST',
         url: 'saveClient',
-        data: $scope.formData,
+        data: Object.assign({}, $scope.formData, localCredentials.params)
       })
       .then(function successCallback(response) {
         console.log(response.data);
@@ -274,7 +283,7 @@ app.controller("reportController", function ($scope, $http, $routeParams) {
     endpoint = endpoint + '/' + $routeParams.params;
   }
 
-  $http.get(endpoint)
+  $http.get(endpoint, localCredentials)
     .then(function successCallback(response) {
       $scope.reportData = response.data;
     }, function errorCallback(response) {
@@ -283,10 +292,12 @@ app.controller("reportController", function ($scope, $http, $routeParams) {
 
   $scope.loadReport = function(sortColumn) {
     var config = {
-        params: {
+        params: Object.assign({},
+        {
           'sortColumn': sortColumn,
           'sortOrder': sortOrders[(sortOrderIndex ^= 1)]
-        }
+        },
+        localCredentials.params)
       };
     $http.get(endpoint, config)
       .then(function successCallback(response) {
@@ -307,7 +318,7 @@ app.controller("graphController", function ($scope, $http, $routeParams) {
     endpoint = endpoint + '/' + $routeParams.params;
   }
 
-  $http.get('revenue-years')
+  $http.get('revenue-years', localCredentials)
     .then(function successCallback(response) {
       console.log(response.data);
       $scope.revenueYears = [{ 'revenueYear': 'ALL' }].concat(response.data);
@@ -317,7 +328,7 @@ app.controller("graphController", function ($scope, $http, $routeParams) {
 
   $scope.labels = [];
   $scope.data = [];
-  $http.get(endpoint)
+  $http.get(endpoint, localCredentials)
     .then(function successCallback(response) {
       console.log(response.data);
       response.data.forEach(function (rowData) {
@@ -341,7 +352,7 @@ app.controller("graphController", function ($scope, $http, $routeParams) {
       $scope.labels = [];
       $scope.data = [];
 
-      $http.get('revenue-by-topic/' + revenueYear)
+      $http.get('revenue-by-topic/' + revenueYear, localCredentials)
         .then(function successCallback(response) {
           response.data.forEach(function (rowData) {
             $scope.labels.push(rowData.name);

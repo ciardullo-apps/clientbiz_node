@@ -17,5 +17,6 @@ module.exports = {
   dbTlsCertAuthPath: process.env.DB_TLS_CERT_AUTH_PATH,
   dbSchema: process.env.DB_SCHEMA,
   dbUser: process.env.DB_USER,
-  dbPass: process.env.DB_PASS
+  dbPass: process.env.DB_PASS,
+  passportStrategy: process.env.PASSPORT_STRATEGY
 };
