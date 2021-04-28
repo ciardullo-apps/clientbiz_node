@@ -215,11 +215,11 @@ clientBizRouter.get('/topics/:clientId', passport.authenticate(config.passportSt
   .fetchAll({withRelated: ['topic']})
   .then(function(rows) {
     rows.toJSON().forEach(function (model) {
-      topics.push(model.topic_id)
-      // topics.push ({
-      //   'topic_id': model.topic_id,
-      //   'topic_name': model.topic.name
-      // })
+      // topics.push(model.topic_id)
+      topics.push ({
+        'topic_id': model.topic_id,
+        'topic_name': model.topic.name
+    })
     })
     response.json(topics);
     response.status(200).end();
