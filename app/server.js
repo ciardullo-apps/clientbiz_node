@@ -219,7 +219,7 @@ clientBizRouter.get('/topics/:clientId', passport.authenticate(config.passportSt
       topics.push ({
         'id': model.topic_id,
         'name': model.topic.name
-    })
+      })
     })
     response.json(topics);
     response.status(200).end();
@@ -409,7 +409,7 @@ clientBizRouter.get('/activity-year-month/:year/:month', passport.authenticate(c
 
   new Appointment()
   .query()
-  .select('appointment.*', 'clientele.firstname', 'clientele.lastname', 'topic.name as topicname')
+  .select('appointment.*', 'clientele.firstname', 'clientele.lastname', 'topic.name as topic_name')
   .join('clientele', {'appointment.client_id': 'clientele.id'})
   .join('topic', {'appointment.topic_id': 'topic.id'})
   .whereRaw('YEAR(starttime) = ? and MONTH(starttime) = ?', [year, month])
