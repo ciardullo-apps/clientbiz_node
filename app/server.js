@@ -111,7 +111,8 @@ clientBizRouter.get('/client', passport.authenticate(config.passportStrategy, { 
         'solicited': model.get('solicited'),
         'numappts': model.get('numappts'),
         'revenue': model.get('revenue'),
-        'lastapptdate': (model.get('lastapptdate') ? model.get('lastapptdate').toJSON().slice(0,10) : "")
+        'lastapptdate': (model.get('lastapptdate') ? model.get('lastapptdate').toJSON().slice(0,10) : ""),
+        'totalhours': model.get('totalhours')
       });
     });
     response.json(clients);

@@ -13,7 +13,11 @@ from appointment a
 where a.client_id = c.id) as lastapptdate,
 (select date_format(max(starttime), '%Y-%m')
 from appointment a
-where a.client_id = c.id) as lastapptyearmonth
+where a.client_id = c.id) as lastapptyearmonth,
+(select sum(duration) / 60
+from appointment a
+where a.client_id = c.id
+group by a.client_id) as totalhours
 from clientele c
 order by lastapptyearmonth desc, numappts desc
 );

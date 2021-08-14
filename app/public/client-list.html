@@ -23,6 +23,7 @@
         <th><a href ng-click="loadClients('timezone')">Timezone</a></th>
         <th><a href ng-click="loadClients('solicited')">Solicited</a></th>
         <th><a href ng-click="loadClients('numappts')"># Appointments</a></th>
+        <th><a href ng-click="loadClients('totalhours')">Hours</a></th>
         <th><a href ng-click="loadClients('revenue')">Revenue</a></th>
         <th><a href ng-click="loadClients('lastapptdate')">Last Appointment</a></th>
       </tr>
@@ -36,6 +37,7 @@
         <td>{{ customer.timezone }}</td>
         <td><input type="checkbox" ng-checked="!!+customer.solicited" disabled="true"></td>
         <td><a ng-href="#!/appointments/{{ customer.id }}">{{ customer.numappts }}</a></td>
+        <td>{{ customer.totalhours | number : 2}}</td>
         <td>{{ customer.revenue | currency:"$ " : 2 }}</td>
         <td>{{ customer.lastapptdate }}</td>
       </tr>
