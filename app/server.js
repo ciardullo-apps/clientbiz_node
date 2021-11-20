@@ -341,7 +341,9 @@ clientBizRouter.post('/saveClient', passport.authenticate(config.passportStrateg
     }
     return clientele
       .save(payload, options)
-      .tap(function(model) {
+      .then(function(model) {
+        response.json({ 'updatedClientId': model.id });
+        response.status(200).end();
         return Promise.map(insertTopics, function(info) {
           return new ClientTopic(info)
             .save({'client_id': model.id}, {transacting: t})
@@ -354,12 +356,6 @@ clientBizRouter.post('/saveClient', passport.authenticate(config.passportStrateg
         console.log(err);
         t.rollback(err);
       })
-      .then((model) => {
-        // TODO Change to rowsAffected
-        // TODO Rollback if too many rows updated
-        response.json({ 'updatedClientId': model.id });
-        response.status(200).end();
-      });
   })
 });
 
@@ -387,7 +383,7 @@ clientBizRouter.get('/monthly-activity', passport.authenticate(config.passportSt
   .count('id as totalAppointments')
   .groupBy('monthOfYear')
   .orderBy(sortColumn, sortOrder)
-  .tap(function(reportData) {
+  .then(function(reportData) {
     response.json(reportData);
     response.status(200).end();
   });
@@ -415,7 +411,7 @@ clientBizRouter.get('/activity-year-month/:year/:month', passport.authenticate(c
   .join('topic', {'appointment.topic_id': 'topic.id'})
   .whereRaw('YEAR(starttime) = ? and MONTH(starttime) = ?', [year, month])
   .orderBy(sortColumn, sortOrder)
-  .tap(function(reportData) {
+  .then(function(reportData) {
     response.json(reportData);
     response.status(200).end();
   })
@@ -438,7 +434,7 @@ clientBizRouter.get('/revenue-by-topic/:year?', passport.authenticate(config.pas
     }
   })
   .groupBy('name')
-  .tap(function(reportData) {
+  .then(function(reportData) {
     response.json(reportData);
     response.status(200).end();
   })
@@ -449,7 +445,7 @@ clientBizRouter.get('/revenue-years', passport.authenticate(config.passportStrat
   .query()
   .select(bookshelf.knex.raw('distinct year(starttime) as revenueYear'))
   .orderBy('revenueYear')
-  .tap(function(reportData) {
+  .then(function(reportData) {
     response.json(reportData);
     response.status(200).end();
   })
