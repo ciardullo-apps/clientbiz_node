@@ -307,17 +307,14 @@ clientBizRouter.post('/saveClient', passport.authenticate(config.passportStrateg
   delete request.body.password
 
   let offset = new Date().getTimezoneOffset();
-  if (request.body.solicited === 0) {
+  if (!(request.body.solicited)) {
     request.body['firstcontact'] = null;
   } else {
-    let firstContact = new Date(request.body.firstcontact);
-    firstContact.setMinutes(firstContact.getMinutes() - offset)
-    request.body.firstcontact = firstContact.toISOString().slice(0, 19).replace('T', ' ');
+    // firstContact.setMinutes(firstContact.getMinutes() - offset)
+    request.body.firstcontact = request.body.firstContact.replace('T', ' ');
   }
 
-  let firstResponse = new Date(request.body.firstresponse);
-  firstResponse.setMinutes(firstResponse.getMinutes() - offset)
-  request.body.firstresponse = firstResponse.toISOString().slice(0, 19).replace('T', ' ');
+  request.body.firstresponse = request.body.firstresponse.replace('T', ' ');
 
   console.log(request.body);
 
