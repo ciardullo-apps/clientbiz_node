@@ -311,7 +311,7 @@ clientBizRouter.post('/saveClient', passport.authenticate(config.passportStrateg
     request.body['firstcontact'] = null;
   } else {
     // firstContact.setMinutes(firstContact.getMinutes() - offset)
-    request.body.firstcontact = request.body.firstContact.replace('T', ' ');
+    request.body.firstcontact = request.body.firstcontact.replace('T', ' ');
   }
 
   request.body.firstresponse = request.body.firstresponse.replace('T', ' ');
