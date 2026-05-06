@@ -33,7 +33,7 @@ module.exports = (passport) => {
   };
 
   router.post('/authorize', validatePayloadMiddleware, (req, res) => {
-    // console.log('In /authorize', req.body);
+    console.log('In /authorize', req.body);
     const userLogin = req.body;
     if(userLogin && userLogin.email && isAuthorizedUser(userLogin.email)) {
       const token = jwt.sign(userLogin, `${config.jwtKey}`);

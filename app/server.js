@@ -250,7 +250,7 @@ clientBizRouter.get('/receivables', passport.authenticate(config.passportStrateg
           'duration': model.duration,
           'rate': model.rate,
           'billingpct': model.billingpct,
-          'paid': (model.paid ? model.paid.toLocaleString("en-US", { timeZone: 'UTC' }) : '')
+          'paid': (model.paid ? model.paid.toLocaleString("en-US", { timeZone: 'UTC' }) : null)
       })
     })
 
@@ -414,7 +414,7 @@ clientBizRouter.get('/activity-year-month/:year/:month', passport.authenticate(c
   })
 });
 
-clientBizRouter.get('/revenue-by-topic/:year?', passport.authenticate(config.passportStrategy, { session: false }), function(request, response) {
+clientBizRouter.get('/revenue-by-topic/:year?', function(request, response) {
   var year = parseInt(request.params['year']);
   console.log(year);
   new Appointment()
@@ -437,7 +437,7 @@ clientBizRouter.get('/revenue-by-topic/:year?', passport.authenticate(config.pas
   })
 });
 
-clientBizRouter.get('/revenue-years', passport.authenticate(config.passportStrategy, { session: false }), function(request, response) {
+clientBizRouter.get('/revenue-years', function(request, response) {
   new Appointment()
   .query()
   .select(bookshelf.knex.raw('distinct year(starttime) as revenueYear'))
