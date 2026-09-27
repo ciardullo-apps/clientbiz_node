@@ -1,14 +1,14 @@
 const config = require('./config');
 var fs = require('fs');
 var knex = require('knex')({
-  client: 'mysql',
+  client: 'mysql2',
   connection: {
     // debug    : true,
     host     : config.dbHost,
     user     : config.dbUser,
     password : config.dbPass,
     database : config.dbSchema,
-    timezone: 'utc',
+    timezone: 'Z',
     ssl: {
       ca: fs.readFileSync(config.dbTlsCertAuthPath)
     }
